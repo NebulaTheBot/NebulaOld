@@ -31,7 +31,7 @@ export default class View {
       return errorEmbed(
         interaction,
         "No news found.",
-        "Admins can add news with the **/server news send** command."
+        "Admins can add news with the **/news send** command."
       );
 
     if (page > sortedNews.length) page = sortedNews.length;
@@ -69,7 +69,7 @@ export default class View {
           errorEmbed(
             interaction,
             "No.",
-            "You have not sent this command. Type **/server news view** to view news yourself."
+            "You have not sent this command. Type **/news view** to view news yourself."
           );
           return;
         }

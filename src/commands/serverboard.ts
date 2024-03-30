@@ -32,7 +32,7 @@ export default class Serverboard {
       return errorEmbed(
         interaction,
         "No public server found",
-        "By some magical miracle, all the servers using Sokora turned off their visibility. Use /server settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible."
+        "By some magical miracle, all the servers using Sokora turned off their visibility. Use /settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible."
       );
 
     const argPage = interaction.options.get("page")?.value as number;

@@ -3,6 +3,7 @@ import {
   InteractionType,
   EmbedBuilder,
   SlashCommandBuilder,
+  PermissionsBitField,
   type ChatInputCommandInteraction
 } from "discord.js";
 import {
@@ -12,6 +13,7 @@ import {
   settingsKeys
 } from "../utils/database/settings";
 import { genColor } from "../utils/colorGen";
+import { errorEmbed } from "../utils/embeds/errorEmbed";
 
 export default class Settings {
   data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
@@ -35,6 +37,17 @@ export default class Settings {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
+    if (
+      !interaction.guild?.members.cache
+        ?.get(interaction.member?.user.id!)
+        ?.permissions.has(PermissionsBitField.Flags.Administrator)
+    )
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "You need the **Administrator** permission."
+      );
+
     const key = interaction.options.get("key")!.value as keyof typeof settingsDefinition;
     const value = interaction.options.get("value")?.value;
     if (value == undefined)

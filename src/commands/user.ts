@@ -81,9 +81,9 @@ export default class User {
       .setColor(genColor(200));
 
     imageColor(embed, undefined, target);
-    if (!getSetting(`${guild.id}`, "levelling.enabled"))
-      await interaction.reply({ embeds: [embed] });
+    const reply = await interaction.reply({ embeds: [embed], components: [] });
 
+    if (!getSetting(`${guild.id}`, "levelling.enabled")) return;
     const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
     if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
 
@@ -116,7 +116,7 @@ export default class User {
         .setStyle(ButtonStyle.Primary)
     );
 
-    const reply = await interaction.reply({ embeds: [embed], components: [row] });
+    reply.edit({ embeds: [embed], components: [row] });
     reply
       .createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {

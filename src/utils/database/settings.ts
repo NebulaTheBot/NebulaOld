@@ -1,4 +1,4 @@
-// TODO: Add more settings
+// TODO: make the LIST type work
 import { getDatabase } from ".";
 import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 
@@ -14,7 +14,8 @@ const tableDefinition = {
 export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "TEXT",
-  //"levelling.blockedChannels": "LIST", // TODO: Add this to the levelling command
+  "levelling.blockChannels": "TEXT",
+  "levelling.setLevel": "INTEGER",
   "moderation.channel": "TEXT",
   "moderation.logMessages": "BOOL",
   "news.channelID": "TEXT",
@@ -47,14 +48,13 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
   >[];
   if (res.length == 0) return null;
   switch (settingsDefinition[key]) {
-    case "TEXT":
+    case "TEXT" || "INTEGER":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
       return (res[0].value == "true") as TypeOfKey<K>;
     // case "LIST":
-    //   return (res[0].value.split(",") as unknown) as TypeOfKey<K>; // TODO: Make this type usable
+    //   return (res[0].value.split(",") as unknown) as TypeOfKey<K>;
     default:
-      // TODO: Implement more data types
       return "WIP" as TypeOfKey<K>;
   }
 }

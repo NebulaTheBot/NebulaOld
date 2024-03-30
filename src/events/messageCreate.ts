@@ -26,20 +26,31 @@ export default {
       }
 
       // Levelling
-      const levelChannelId = getSetting(guild.id, "levelling.channel");
       if (!getSetting(guild.id, "levelling.enabled")) return;
 
+      const blockedChannels = getSetting(guild.id, "levelling.blockChannels")!;
+      if (blockedChannels != undefined)
+        for (const channelID of blockedChannels.split(", "))
+          if (message.channelId === channelID) return;
+
+      const levelChannelId = getSetting(guild.id, "levelling.channel");
       const [guildExp, guildLevel] = getLevel(guild.id, author.id);
       const [globalExp, globalLevel] = getLevel("0", author.id);
+      const expPerMessage = 2;
       const expUntilLevelup = Math.floor(100 * 1.25 * (guildLevel + 1));
+      const newLevelData = { level: guildLevel ?? 0, exp: (guildExp ?? 0) + expPerMessage };
+      const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + expPerMessage };
 
-      if (!(guildExp >= expUntilLevelup - 1)) {
-        setLevel(0, author.id, globalLevel ?? 0, (globalExp ?? 0) + 2);
-        return setLevel(guild.id, author.id, globalLevel ?? 0, (globalExp ?? 0) + 2);
+      if (guildExp < expUntilLevelup - 1) {
+        setLevel(0, author.id, globalNewLevelData.exp, globalNewLevelData.level);
+        return setLevel(guild.id, author.id, globalNewLevelData.exp, globalNewLevelData.level);
       } else if (guildExp >= expUntilLevelup - 1) {
         let leftOverExp = guildExp - expUntilLevelup;
         if (leftOverExp < 0) leftOverExp = 0;
-        setLevel(guild.id, author.id, guildLevel + 1, leftOverExp ?? 0);
+
+        newLevelData.exp = leftOverExp ?? 0;
+        newLevelData.level = guildLevel + 1;
+        setLevel(guild.id, author.id, newLevelData.exp, newLevelData.level);
       }
 
       if (guildExp >= Math.floor(100 * 1.25 * (globalLevel + 1)) - 1) {
