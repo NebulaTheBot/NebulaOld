@@ -7,7 +7,7 @@ export default class About {
   constructor() {
     this.data = new SlashCommandBuilder()
       .setName("about")
-      .setDescription("Shows information about the bot.");
+      .setDescription("Shows information about Sokora.");
   }
 
   async run(interaction: ChatInputCommandInteraction) {

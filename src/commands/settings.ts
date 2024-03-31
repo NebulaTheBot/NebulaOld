@@ -20,7 +20,7 @@ export default class Settings {
   constructor() {
     this.data = new SlashCommandBuilder()
       .setName("settings")
-      .setDescription("Configure the bot")
+      .setDescription("Configure Sokora to your liking.")
       .addStringOption(string =>
         string
           .setName("key")

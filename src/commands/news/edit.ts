@@ -22,8 +22,8 @@ export default class Edit {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("edit")
       .setDescription("Edits the news of your guild.")
-      .addStringOption(option =>
-        option
+      .addStringOption(string =>
+        string
           .setName("id")
           .setDescription("The ID of the news you want to edit.")
           .setRequired(true)

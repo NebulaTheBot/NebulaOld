@@ -16,8 +16,8 @@ export default class Remove {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("remove")
       .setDescription("Removes news from your guild.")
-      .addStringOption(option =>
-        option
+      .addStringOption(string =>
+        string
           .setName("id")
           .setDescription("The ID of the news. Found in the footer of the news.")
           .setRequired(true)

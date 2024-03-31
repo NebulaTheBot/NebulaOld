@@ -83,7 +83,7 @@ export default class User {
     imageColor(embed, undefined, target);
     const reply = await interaction.reply({ embeds: [embed], components: [] });
 
-    if (!getSetting(`${guild.id}`, "levelling.enabled")) return;
+    if (!getSetting(`${guild.id}`, "levelling.enabled" || selectedUser.bot)) return;
     const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
     if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
 
