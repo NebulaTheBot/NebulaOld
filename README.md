@@ -11,7 +11,7 @@
 # About
 Nebula is a multiplatform, multipurpose bot with the ability to add extensions to have additional features.
 
-**Please note that Nebula is currently in an alpha preview state and only usable within Discord with limited functionality.**
+Unfortunately, the bot is **currently offline**, join our [Discord server](https://discord.gg/958r8ZgjtZ) to stay up to date with the latest news.
 
 # Contributing
 While we're developing the multiplatform version of the bot, you can still [help us](CONTRIBUTING.MD) if you find any bugs.
