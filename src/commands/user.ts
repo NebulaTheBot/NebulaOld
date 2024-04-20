@@ -5,12 +5,9 @@ import {
   ButtonStyle,
   ButtonInteraction,
   ActionRowBuilder,
-  ComponentType,
-  type ChatInputCommandInteraction,
-  type Role
+  type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
-import { get as getLevelRewards } from "../utils/database/levelRewards";
 import { getSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { imageColor } from "../utils/imageColor";
@@ -81,27 +78,18 @@ export default class User {
       .setColor(genColor(200));
 
     imageColor(embed, undefined, target);
-    const reply = await interaction.reply({ embeds: [embed], components: [] });
+    await interaction.reply({ embeds: [embed], components: [] });
 
     if (!getSetting(`${guild.id}`, "levelling.enabled" || selectedUser.bot)) return;
     const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
+    const [globalExp, globalLevel] = getLevel("0", `${target.id}`)!;
     if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
+    if (!globalExp && !globalLevel) setLevel("0", `${target.id}`, 0, 0);
 
-    const formattedExpUntilLevelup = Math.floor(
-      100 * 1.25 * ((guildLevel ?? 0) + 1)
-    )?.toLocaleString("en-US");
-    let rewards: (void | Role | null)[] = [];
-    let nextReward;
-
-    for (const { roleID, level } of getLevelRewards(`${guild.id}`)) {
-      if (guildLevel < level) {
-        if (nextReward) break;
-        nextReward = { roleID, level };
-        break;
-      }
-
-      rewards.push(await guild.roles.fetch(`${roleID}`)?.catch(() => {}));
-    }
+    const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
+    const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
+      "en-US"
+    );
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
@@ -116,41 +104,48 @@ export default class User {
         .setStyle(ButtonStyle.Primary)
     );
 
-    reply.edit({ embeds: [embed], components: [row] });
-    reply
-      .createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 })
+    await interaction.editReply({ embeds: [embed], components: [row] });
+    interaction.channel
+      ?.createMessageComponentCollector({
+        filter: i => i.user.id === interaction.user.id,
+        time: 60000
+      })
       .on("collect", async (i: ButtonInteraction) => {
-        let testEmbed: EmbedBuilder = new EmbedBuilder();
         const levelEmbed = new EmbedBuilder()
           .setAuthor({
             name: `•  ${target.nickname ?? selectedUser.displayName}`,
             iconURL: target.displayAvatarURL()
           })
-          .setFields({
-            name: `⚡ • Level ${guildLevel ?? 0}`,
-            value: [
-              `**${guildExp.toLocaleString("en-US") ?? 0}/${formattedExpUntilLevelup}** EXP`,
-              `**Next level**: ${(guildLevel ?? 0) + 1}`,
-              `${
-                rewards.length > 0
-                  ? rewards.map(reward => `<@&${reward?.id}>`).join(" ")
-                  : "*No rewards unlocked*"
-              }`
-            ].join("\n")
-          })
+          .setFields(
+            {
+              name: `⚡ • Guild level ${guildLevel ?? 0}`,
+              value: [
+                `**${guildExp.toLocaleString("en-US") ?? 0}/${nextLevelExp}** EXP`,
+                `**Next level**: ${(guildLevel ?? 0) + 1}`
+              ].join("\n"),
+              inline: true
+            },
+            {
+              name: `⛈️ • Global level ${globalLevel ?? 0}`,
+              value: [
+                `**${globalExp.toLocaleString("en-US") ?? 0}/${globalNextLevelExp}** EXP`,
+                `**Next level**: ${(globalLevel ?? 0) + 1}`
+              ].join("\n"),
+              inline: true
+            }
+          )
           .setFooter({ text: `User ID: ${target.id}` })
-          .setThumbnail(target.displayAvatarURL()!)
+          .setThumbnail(target.displayAvatarURL())
           .setColor(genColor(200));
 
         imageColor(levelEmbed, undefined, target);
         switch (i.customId) {
           case "general":
-            testEmbed = embed;
+            await interaction.editReply({ embeds: [embed], components: [row] });
           case "level":
-            testEmbed = levelEmbed;
+            await interaction.editReply({ embeds: [levelEmbed], components: [row] });
         }
 
-        await reply.edit({ embeds: [testEmbed], components: [row] });
         i.update({});
       });
   }

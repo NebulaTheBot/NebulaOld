@@ -37,7 +37,7 @@ export default {
       const [guildExp, guildLevel] = getLevel(guild.id, author.id);
       const [globalExp, globalLevel] = getLevel("0", author.id);
       const expPerMessage = 2;
-      const expUntilLevelup = Math.floor(100 * 1.25 * (guildLevel + 1));
+      const expUntilLevelup = Math.floor(100 * 1.15 * (guildLevel + 1));
       const newLevelData = { level: guildLevel ?? 0, exp: (guildExp ?? 0) + expPerMessage };
       const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + expPerMessage };
 

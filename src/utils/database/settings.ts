@@ -1,4 +1,3 @@
-// TODO: make the LIST type work
 import { getDatabase } from ".";
 import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 
@@ -16,6 +15,7 @@ export const settingsDefinition = {
   "levelling.channel": "TEXT",
   "levelling.blockChannels": "TEXT",
   "levelling.setLevel": "INTEGER",
+  "levelling.addMultiplier": "JSON",
   "moderation.channel": "TEXT",
   "moderation.logMessages": "BOOL",
   "news.channelID": "TEXT",
@@ -52,8 +52,8 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
       return (res[0].value == "true") as TypeOfKey<K>;
-    // case "LIST":
-    //   return (res[0].value.split(",") as unknown) as TypeOfKey<K>;
+    case "JSON":
+      return res[0].value.split("," && ", ") as TypeOfKey<K>;
     default:
       return "WIP" as TypeOfKey<K>;
   }

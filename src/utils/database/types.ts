@@ -1,4 +1,4 @@
-export type FieldData = "TEXT" | "LIST" | "INTEGER" | "FLOAT" | "BOOL" | "TIMESTAMP" | "JSON";
+export type FieldData = "TEXT" | "INTEGER" | "FLOAT" | "BOOL" | "TIMESTAMP" | "JSON";
 
 export type TableDefinition = {
   name: string;
@@ -10,7 +10,6 @@ export type SqlType<T extends FieldData> = {
   INTEGER: number;
   FLOAT: number;
   TEXT: string;
-  LIST: string[];
   TIMESTAMP: Date;
   JSON: any;
 }[T];
