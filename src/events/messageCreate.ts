@@ -6,7 +6,6 @@ import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
-import { kominator } from "../utils/kominator";
 
 export default {
   name: "messageCreate",
@@ -31,12 +30,9 @@ export default {
 
       let [guildExp, guildLevel] = getLevel(guild.id, author.id);
       const newLevel = getSetting(guild.id, "levelling.setLevel")!;
-      console.log(kominator(newLevel));
-      if (newLevel[0] === author.id)
-        if (newLevel[1] != null) {
-          let level = guildLevel.toString();
-          level = newLevel;
-        }
+      const level = parseInt(newLevel[1]);
+      if (newLevel[1] != null)
+        setLevel(guild.id, newLevel[0], level, Math.floor(100 * 1.15 * (level + 1)));
 
       const blockedChannels = getSetting(guild.id, "levelling.blockChannels")!;
       if (blockedChannels != undefined)
@@ -51,15 +47,15 @@ export default {
       const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + expPerMessage };
 
       if (guildExp < expUntilLevelup - 1) {
-        setLevel(0, author.id, globalNewLevelData.exp, globalNewLevelData.level);
-        return setLevel(guild.id, author.id, globalNewLevelData.exp, globalNewLevelData.level);
+        setLevel(0, author.id, globalNewLevelData.level, globalNewLevelData.exp);
+        return setLevel(guild.id, author.id, globalNewLevelData.level, globalNewLevelData.exp);
       } else if (guildExp >= expUntilLevelup - 1) {
         let leftOverExp = guildExp - expUntilLevelup;
         if (leftOverExp < 0) leftOverExp = 0;
 
         newLevelData.exp = leftOverExp ?? 0;
         newLevelData.level = guildLevel + 1;
-        setLevel(guild.id, author.id, newLevelData.exp, newLevelData.level);
+        setLevel(guild.id, author.id, newLevelData.level, newLevelData.exp);
       }
 
       if (guildExp >= Math.floor(100 * 1.25 * (globalLevel + 1)) - 1) {
