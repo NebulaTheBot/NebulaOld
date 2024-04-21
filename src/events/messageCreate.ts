@@ -6,6 +6,7 @@ import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
+import { kominator } from "../utils/kominator";
 
 export default {
   name: "messageCreate",
@@ -16,7 +17,7 @@ export default {
       const guild = message.guild!;
 
       // Easter egg handler
-      if (guild.id === "903852579837059113") {
+      if (guild.id === "1079612082636472420") {
         const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
         for (const easterEggFile of readdirSync(eventsPath))
@@ -28,13 +29,21 @@ export default {
       // Levelling
       if (!getSetting(guild.id, "levelling.enabled")) return;
 
+      let [guildExp, guildLevel] = getLevel(guild.id, author.id);
+      const newLevel = getSetting(guild.id, "levelling.setLevel")!;
+      console.log(kominator(newLevel));
+      if (newLevel[0] === author.id)
+        if (newLevel[1] != null) {
+          let level = guildLevel.toString();
+          level = newLevel;
+        }
+
       const blockedChannels = getSetting(guild.id, "levelling.blockChannels")!;
       if (blockedChannels != undefined)
         for (const channelID of blockedChannels.split(", "))
           if (message.channelId === channelID) return;
 
       const levelChannelId = getSetting(guild.id, "levelling.channel");
-      const [guildExp, guildLevel] = getLevel(guild.id, author.id);
       const [globalExp, globalLevel] = getLevel("0", author.id);
       const expPerMessage = 2;
       const expUntilLevelup = Math.floor(100 * 1.15 * (guildLevel + 1));

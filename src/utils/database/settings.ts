@@ -14,8 +14,8 @@ export const settingsDefinition = {
   "levelling.enabled": "BOOL",
   "levelling.channel": "TEXT",
   "levelling.blockChannels": "TEXT",
-  "levelling.setLevel": "INTEGER",
-  "levelling.addMultiplier": "JSON",
+  "levelling.setLevel": "TEXT",
+  "levelling.addMultiplier": "TEXT",
   "moderation.channel": "TEXT",
   "moderation.logMessages": "BOOL",
   "news.channelID": "TEXT",
@@ -52,8 +52,6 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
       return (res[0].value == "true") as TypeOfKey<K>;
-    case "JSON":
-      return res[0].value.split("," && ", ") as TypeOfKey<K>;
     default:
       return "WIP" as TypeOfKey<K>;
   }

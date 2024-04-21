@@ -3,7 +3,6 @@
  * @param hue Color to randomise.
  * @returns Color in HEX.
  */
-
 export function genColor(hue: number) {
   const h = hue + 15 * Math.random();
   let s = 100;
