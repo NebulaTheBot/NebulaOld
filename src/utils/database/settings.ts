@@ -11,22 +11,22 @@ const tableDefinition = {
 } satisfies TableDefinition;
 
 export const settingsDefinition = {
-  "levelling.enabled": "BOOL",
-  "levelling.channel": "TEXT",
-  "levelling.blockChannels": "TEXT",
-  "levelling.setLevel": "TEXT",
-  "levelling.addMultiplier": "TEXT",
-  "moderation.channel": "TEXT",
-  "moderation.logMessages": "BOOL",
-  "news.channelID": "TEXT",
-  "news.roleID": "TEXT",
-  "news.editOriginalMessage": "BOOL",
-  "serverboard.inviteLink": "TEXT",
-  "serverboard.shown": "BOOL",
-  "welcome.text": "TEXT",
-  "welcome.goodbyeText": "TEXT",
-  "welcome.channel": "TEXT"
-} satisfies Record<string, FieldData>;
+  "levelling.enabled": ["BOOL", "Enable or disable the levelling system"],
+  "levelling.channel": ["TEXT", "The channel ID(s) of the channels where messages are counted for levelling, comma seperated"],
+  "levelling.blockChannels": ["TEXT", "The channel ID(s) of the channels where messages are not counted for levelling, comma seperated"],
+  "levelling.setLevel": ["TEXT", "Set the level of an user"],
+  "levelling.addMultiplier": ["TEXT", "Add an XP multiplier to the levelling system"],
+  "moderation.channel": ["TEXT", "The channel where moderation logs are sent"],
+  "moderation.logMessages": ["BOOL", "Whether or not deleted or edited messages should be logged"],
+  "news.channelID": ["TEXT", "The channel ID(s) of the channels where news messages are sent, comma seperated"],
+  "news.roleID": ["TEXT", "The role ID(s) of the roles that should be pinged when a news message is sent, comma seperated"],
+  "news.editOriginalMessage": ["BOOL", "Whether or not the original message should be edited when a news message is updated"],
+  "serverboard.inviteLink": ["TEXT", "The invite link which should be shown on the serverboard"],
+  "serverboard.shown": ["BOOL", "Whether or not the server should be shown on the serverboard"],
+  "welcome.text": ["TEXT", "The welcome message that should be sent when a user joins, leave blank for nothing"],
+  "welcome.goodbyeText": ["TEXT", "The goodbye message that should be sent when a user leaves, leave blank for nothing"],
+  "welcome.channel": ["TEXT", "The channel ID(s) of the channels where welcome messages are sent, comma seperated"],
+} satisfies Record<string, [FieldData, String]>;
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
 const database = getDatabase(tableDefinition);
@@ -47,7 +47,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     typeof tableDefinition
   >[];
   if (res.length == 0) return null;
-  switch (settingsDefinition[key]) {
+  switch (settingsDefinition[key][0]) {
     case "TEXT" || "INTEGER":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
@@ -66,7 +66,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
   if (!doInsert) {
     deleteQuery.all(JSON.stringify(guildID), key);
   }
-  insertQuery.run(JSON.stringify(guildID), key, value);
+  insertQuery.run(JSON.stringify(guildID), key, JSON.stringify(value));
 }
 
 export function listPublicServers() {
