@@ -68,7 +68,7 @@ export default class Settings {
       if (interaction.type != InteractionType.ApplicationCommandAutocomplete) return;
       if (interaction.options.getSubcommand() != this.data.name) return;
       switch (
-        settingsDefinition[interaction.options.get("key")!.value as keyof typeof settingsDefinition]
+        settingsDefinition[interaction.options.get("key")!.value as keyof typeof settingsDefinition][0]
       ) {
         case "BOOL":
           interaction.respond(

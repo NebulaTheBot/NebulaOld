@@ -39,9 +39,10 @@ export default {
         for (const channelID of blockedChannels.split(", "))
           if (message.channelId === channelID) return;
 
+      const cooldown = getSetting(guild.id, "levelling.setCooldown") ?? 4;
       const levelChannelId = getSetting(guild.id, "levelling.channel");
       const [globalExp, globalLevel] = getLevel("0", author.id);
-      const expPerMessage = 2;
+      const expPerMessage = getSetting(guild.id, "levelling.setXPGain") ?? 2;
       const expUntilLevelup = Math.floor(100 * 1.15 * (guildLevel + 1));
       const newLevelData = { level: guildLevel ?? 0, exp: (guildExp ?? 0) + expPerMessage };
       const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + expPerMessage };

@@ -10,23 +10,27 @@ import {
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { getSetting } from "../../utils/database/settings";
+import ms from "ms";
 
-export default class Purge {
+export default class Slowdown {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("purge")
-      .setDescription("Purges messages.")
-      .addNumberOption(number =>
-        number
-          .setName("amount")
-          .setDescription("The amount of messages that you want to purge.")
+      .setName("slowdown")
+      .setDescription("Slows a channel down.")
+      .addStringOption(string =>
+        string
+          .setName("time")
+          .setDescription("Time to slow the channel down to (e.g 30m, 1d, 2h).")
           .setRequired(true)
+      )
+      .addStringOption(string =>
+        string.setName("reason").setDescription("The reason for the slowdown.")
       )
       .addChannelOption(channel =>
         channel
           .setName("channel")
-          .setDescription("The channel that you want to purge.")
+          .setDescription("The channel that you want to slowdown.")
           .addChannelTypes(
             ChannelType.GuildText,
             ChannelType.PublicThread,
@@ -38,28 +42,31 @@ export default class Purge {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const amount = interaction.options.getNumber("amount")!;
+    const time = interaction.options.getString("time")!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
       return errorEmbed(
         interaction,
         "You can't execute this command",
-        "You need the **Manage Messages** permission."
+        "You need the **Manage Channels** permission."
       );
-
-    if (amount > 100)
-      return errorEmbed(interaction, "You can only purge up to 100 messages at a time.");
-
-    if (amount < 1) return errorEmbed(interaction, "You must purge at least 1 message.");
 
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
+
+    let title = `Set a slowdown of \`${channelOption ?? `${channel.name}`}\` to ${ms(ms(time), {
+      long: true
+    })}.`;
+    if (ms(time) === 0)
+      title = `Removed the slowdown from \`${channelOption ?? `${channel.name}`}\`.`;
+
     const embed = new EmbedBuilder()
-      .setTitle(`Purged ${amount} message${amount == 1 ? "" : "s"}.`)
+      .setTitle(title)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.username}`,
+          `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`,
           `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
         ].join("\n")
       )
@@ -71,9 +78,7 @@ export default class Purge {
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice
     )
-      channel == interaction.channel
-        ? await channel.bulkDelete(amount + 1, true)
-        : await channel.bulkDelete(amount, true);
+      await channel.setRateLimitPerUser(ms(time) / 1000, interaction.options.getString("reason")!);
 
     const logChannel = getSetting(guild.id, "moderation.channel");
     if (logChannel) {

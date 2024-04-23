@@ -25,7 +25,7 @@ export default class Mute {
       .addStringOption(string =>
         string
           .setName("duration")
-          .setDescription("The duration of the mute (e.g 30m, 1d, 2h)")
+          .setDescription("The duration of the mute (e.g 30m, 1d, 2h).")
           .setRequired(true)
       )
       .addStringOption(string =>

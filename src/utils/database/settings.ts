@@ -11,21 +11,23 @@ const tableDefinition = {
 } satisfies TableDefinition;
 
 export const settingsDefinition = {
-  "levelling.enabled": ["BOOL", "Enable or disable the levelling system"],
-  "levelling.channel": ["TEXT", "The channel ID(s) of the channels where messages are counted for levelling, comma seperated"],
-  "levelling.blockChannels": ["TEXT", "The channel ID(s) of the channels where messages are not counted for levelling, comma seperated"],
-  "levelling.setLevel": ["TEXT", "Set the level of an user"],
-  "levelling.addMultiplier": ["TEXT", "Add an XP multiplier to the levelling system"],
-  "moderation.channel": ["TEXT", "The channel where moderation logs are sent"],
-  "moderation.logMessages": ["BOOL", "Whether or not deleted or edited messages should be logged"],
-  "news.channelID": ["TEXT", "The channel ID(s) of the channels where news messages are sent, comma seperated"],
-  "news.roleID": ["TEXT", "The role ID(s) of the roles that should be pinged when a news message is sent, comma seperated"],
-  "news.editOriginalMessage": ["BOOL", "Whether or not the original message should be edited when a news message is updated"],
-  "serverboard.inviteLink": ["TEXT", "The invite link which should be shown on the serverboard"],
-  "serverboard.shown": ["BOOL", "Whether or not the server should be shown on the serverboard"],
-  "welcome.text": ["TEXT", "The welcome message that should be sent when a user joins, leave blank for nothing"],
-  "welcome.goodbyeText": ["TEXT", "The goodbye message that should be sent when a user leaves, leave blank for nothing"],
-  "welcome.channel": ["TEXT", "The channel ID(s) of the channels where welcome messages are sent, comma seperated"],
+  "levelling.enabled": ["BOOL", "Enable/disable the levelling system."],
+  "levelling.channel": ["TEXT", "ID of the log channel for levelling-related stuff (i.e someone levelling up)."],
+  "levelling.blockChannels": ["TEXT", "ID(s) of the channels where messages aren't counted, comma separated."],
+  "levelling.setLevel": ["TEXT", "Set the level of a user."],
+  "levelling.addMultiplier": ["TEXT", "Add an XP multiplier to the levelling system. Syntax: multiplier, role/channel (choose), id."],
+  "levelling.setXPGain": ["INTEGER", "Set the amount of XP a user gains per message."],
+  "levelling.setCooldown": ["INTEGER", "Set the cooldown between messages that add XP."],
+  "moderation.channel": ["TEXT", "ID of the log channel for moderation-related stuff (i.e a message being edited)."],
+  "moderation.logMessages": ["BOOL", "Whether or not edited/deleted messages should be logged."],
+  "news.channelID": ["TEXT", "ID of the channel where news messages are sent."],
+  "news.roleID": ["TEXT", "ID of the roles that should be pinged when a news message is sent."],
+  "news.editOriginalMessage": ["BOOL", "Whether or not the original message should be edited when a news message is updated."],
+  "serverboard.inviteLink": ["TEXT", "The invite link which is shown on the serverboard."],
+  "serverboard.shown": ["BOOL", "Whether or not the server should be shown on the serverboard."],
+  "welcome.text": ["TEXT", "The welcome message that is sent when a user joins."],
+  "welcome.goodbyeText": ["TEXT", "The goodbye message that is sent when a user leaves."],
+  "welcome.channel": ["TEXT", "ID of the channel where welcome messages are sent."],
 } satisfies Record<string, [FieldData, String]>;
 
 export const settingsKeys = Object.keys(settingsDefinition) as (keyof typeof settingsDefinition)[];
@@ -76,4 +78,4 @@ export function listPublicServers() {
 }
 
 // Utility type
-type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<(typeof settingsDefinition)[T]>;
+type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<(typeof settingsDefinition)[T][0]>;
