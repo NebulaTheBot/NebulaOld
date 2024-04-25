@@ -3,9 +3,10 @@ import { pathToFileURL } from "url";
 import { join } from "path";
 import { readdirSync } from "fs";
 import { genColor } from "../utils/colorGen";
-import { getSetting } from "../utils/database/settings";
+import { getSetting, setSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
+import { kominator } from "../utils/kominator";
 
 export default {
   name: "messageCreate",
@@ -28,24 +29,29 @@ export default {
       // Levelling
       if (!getSetting(guild.id, "levelling.enabled")) return;
 
-      let [guildExp, guildLevel] = getLevel(guild.id, author.id);
-      const newLevel = getSetting(guild.id, "levelling.setLevel")!;
-      const level = parseInt(newLevel[1]);
-      if (newLevel[1] != null)
-        setLevel(guild.id, newLevel[0], level, Math.floor(100 * 1.15 * (level + 1)));
+      const level = getSetting(guild.id, "levelling.setLevel")!;
+      if (level != "") {
+        const newLevel = kominator(level);
+        console.log(newLevel[0]);
+        setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
+        setSetting(guild.id, "levelling.setLevel", "");
+      }
 
       const blockedChannels = getSetting(guild.id, "levelling.blockChannels")!;
       if (blockedChannels != undefined)
         for (const channelID of blockedChannels.split(", "))
           if (message.channelId === channelID) return;
 
-      const cooldown = getSetting(guild.id, "levelling.setCooldown") ?? 4;
+      // const cooldown = getSetting(guild.id, "levelling.setCooldown") ?? 4;
       const levelChannelId = getSetting(guild.id, "levelling.channel");
-      const [globalExp, globalLevel] = getLevel("0", author.id);
-      const expPerMessage = getSetting(guild.id, "levelling.setXPGain") ?? 2;
-      const expUntilLevelup = Math.floor(100 * 1.15 * (guildLevel + 1));
-      const newLevelData = { level: guildLevel ?? 0, exp: (guildExp ?? 0) + expPerMessage };
-      const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + expPerMessage };
+      const [guildLevel, guildExp] = getLevel(guild.id, author.id);
+      const [globalLevel, globalExp] = getLevel("0", author.id);
+      const expUntilLevelup = 100 * 1.15 * (guildLevel + 1);
+      const newLevelData = {
+        level: guildLevel ?? 0,
+        exp: (guildExp ?? 0) + getSetting(guild.id, "levelling.setXPGain")! ?? 2
+      };
+      const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + 2 };
 
       if (guildExp < expUntilLevelup - 1) {
         setLevel(0, author.id, globalNewLevelData.level, globalNewLevelData.exp);

@@ -52,7 +52,7 @@ export default class Settings {
     const value = interaction.options.get("value")?.value;
     if (value == undefined)
       return interaction.reply(
-        `\`${key}\` is currently \`${JSON.stringify(getSetting(interaction.guildId!, key))}\``
+        `\`${key}\` is currently \`${getSetting(interaction.guildId!, key)}\``
       );
 
     const embed = new EmbedBuilder()

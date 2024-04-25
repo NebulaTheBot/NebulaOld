@@ -81,10 +81,10 @@ export default class User {
     await interaction.reply({ embeds: [embed], components: [] });
 
     if (!getSetting(`${guild.id}`, "levelling.enabled" || selectedUser.bot)) return;
-    const [guildExp, guildLevel] = getLevel(`${guild.id}`, `${target.id}`)!;
-    const [globalExp, globalLevel] = getLevel("0", `${target.id}`)!;
-    if (!guildExp && !guildLevel) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
-    if (!globalExp && !globalLevel) setLevel("0", `${target.id}`, 0, 0);
+    const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
+    const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
+    if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
+    if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
 
     const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
     const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
