@@ -32,7 +32,6 @@ export default {
       const level = getSetting(guild.id, "levelling.setLevel")!;
       if (level != "") {
         const newLevel = kominator(level);
-        console.log(newLevel[0]);
         setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
         setSetting(guild.id, "levelling.setLevel", "");
       }
@@ -41,6 +40,18 @@ export default {
       if (blockedChannels != undefined)
         for (const channelID of blockedChannels.split(", "))
           if (message.channelId === channelID) return;
+
+      let expGain = getSetting(guild.id, "levelling.setXPGain")! ?? 2;
+      const multiplier = getSetting(guild.id, "levelling.addMultiplier")!;
+      if (multiplier != null) {
+        const expMultiplier = kominator(multiplier);
+
+        if (expMultiplier[1] === "channel") if (message.channelId !== expMultiplier[2]) return;
+        if (expMultiplier[1] === "role")
+          if (!message.member?.roles.cache.has(expMultiplier[2])) return;
+
+        expGain = expGain * +expMultiplier[0];
+      }
 
       // const cooldown = getSetting(guild.id, "levelling.setCooldown") ?? 4;
       const levelChannelId = getSetting(guild.id, "levelling.channel");
