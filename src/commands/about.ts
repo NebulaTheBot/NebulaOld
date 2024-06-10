@@ -27,7 +27,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "**Version** 0.1, *the Antei update*",
+            "**Version** 0.1-preview, *Kaishi*",
             `**${members}** members • **${guilds.size}** guild${guilds.size === 1 ? "" : "s"} ${
               shards == undefined ? "" : `• **${shards}** shard${shards === 1 ? "" : "s"}`
             }`
@@ -37,10 +37,10 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Head developer**: Goos",
-            "**Developers**: Dimkauzh, Froxcey, Golem64, Spectrum, ThatBOI",
+            "**Developers**: Dimkauzh, Froxcey, Golem64, Spectrum, Nikkerudon, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI, Trynera",
-            "**Testers**: Blaze, fishy, flojo, Trynera",
+            "**Testers**: Blaze, fishy, flojo, Tech, Trynera",
             "And **YOU**, for using Sokora."
           ].join("\n")
         },

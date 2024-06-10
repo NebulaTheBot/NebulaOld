@@ -1,16 +1,10 @@
 import {
   SlashCommandSubcommandBuilder,
-  EmbedBuilder,
   PermissionsBitField,
-  TextChannel,
-  DMChannel,
-  ChannelType,
-  type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
+import { modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -20,6 +14,9 @@ export default class Ban {
       .setDescription("Bans a user.")
       .addUserOption(user =>
         user.setName("user").setDescription("The user that you want to ban.").setRequired(true)
+      )
+      .addStringOption(string =>
+        string.setName("duration").setDescription("The duration of the ban (e.g 30m, 1d, 2h).")
       )
       .addStringOption(string =>
         string.setName("reason").setDescription("The reason for the ban.")
@@ -60,41 +57,7 @@ export default class Ban {
       );
 
     const reason = interaction.options.getString("reason");
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`Banned ${name}.`)
-      .setDescription(
-        [
-          `**Moderator**: ${interaction.user.displayName}`,
-          `**Reason**: ${reason ?? "No reason provided"}`
-        ].join("\n")
-      )
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-
-    const logChannel = getSetting(guild.id, "moderation.channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
     await target.ban({ reason: reason ?? undefined });
-    await interaction.reply({ embeds: [embed] });
-
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (!dmChannel) return;
-    if (user.bot) return;
-    await dmChannel.send({
-      embeds: [embed.setTitle("You got banned.").setColor(genColor(0))]
-    });
+    await modEmbed({ interaction, user, action: "Banned", reason });
   }
 }

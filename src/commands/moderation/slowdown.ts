@@ -21,7 +21,9 @@ export default class Slowdown {
       .addStringOption(string =>
         string
           .setName("time")
-          .setDescription("Time to slow the channel down to (e.g 30m, 1d, 2h).")
+          .setDescription(
+            "Time to slow the channel down to (e.g 30m, 1d, 2h). 0 to remove slowdown."
+          )
           .setRequired(true)
       )
       .addStringOption(string =>
