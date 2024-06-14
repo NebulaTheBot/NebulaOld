@@ -1,11 +1,10 @@
 import {
-  SlashCommandSubcommandBuilder,
   PermissionsBitField,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { modEmbed } from "../../utils/embeds/modEmbed";
 import ms from "ms";
+import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Mute {
   data: SlashCommandSubcommandBuilder;
@@ -31,48 +30,22 @@ export default class Mute {
     const user = interaction.options.getUser("user")!;
     const duration = interaction.options.getString("duration")!;
     const reason = interaction.options.getString("reason");
-    const members = interaction.guild?.members.cache!;
-    const member = members.get(interaction.member?.user.id!)!;
-    const target = members.get(user.id)!;
-    const name = user.displayName;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.MuteMembers))
-      return errorEmbed(
-        interaction,
-        "You can't execute this command.",
-        "You need the **Mute Members** permission."
-      );
-
-    if (target === member) return errorEmbed(interaction, "You can't mute yourself.");
-    if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't mute Sokora.");
-
-    if (!target.manageable)
-      return errorEmbed(
-        interaction,
-        `You can't mute ${name}.`,
-        "The member has a higher role position than Sokora."
-      );
-
-    if (member.roles.highest.position < target.roles.highest.position)
-      return errorEmbed(
-        interaction,
-        `You can't mute ${name}.`,
-        "The member has a higher role position than you."
-      );
-
-    if (!ms(duration) || ms(duration) > ms("28d"))
-      return errorEmbed(
-        interaction,
-        `You can't mute ${name}`,
-        "The duration is invalid or is above the 28 day limit."
-      );
+    errorCheck(PermissionsBitField.Flags.MuteMembers, {
+      interaction,
+      user,
+      action: "Mute",
+      duration
+    });
 
     const time = new Date(
       Date.parse(new Date().toISOString()) + Date.parse(new Date(ms(duration)).toISOString())
     ).toISOString();
 
-    await target.edit({ communicationDisabledUntil: time, reason: reason ?? undefined });
-    await modEmbed({ interaction, user, action: "Muted", duration, reason });
+    await interaction.guild?.members.cache
+      .get(user.id)
+      ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined });
+
+    await modEmbed({ interaction, user, action: "Muted", duration }, reason);
   }
 }

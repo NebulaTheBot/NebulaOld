@@ -1,10 +1,9 @@
 import {
-  SlashCommandSubcommandBuilder,
   PermissionsBitField,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { modEmbed } from "../../utils/embeds/modEmbed";
+import { modEmbed, errorCheck } from "../../utils/embeds/modEmbed";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -25,39 +24,9 @@ export default class Ban {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
-    const guild = interaction.guild!;
-    const members = guild.members.cache;
-    const member = members.get(interaction.member?.user.id!)!;
-    const target = members.get(user.id)!;
-    const name = user.displayName;
-
-    if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
-      return errorEmbed(
-        interaction,
-        "You can't execute this command.",
-        "You need the **Ban Members** permission."
-      );
-
-    if (target === member) return errorEmbed(interaction, "You can't ban yourself.");
-    if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't ban Sokora.");
-
-    if (!target.manageable)
-      return errorEmbed(
-        interaction,
-        `You can't ban ${name}.`,
-        "The member has a higher role position than Sokora."
-      );
-
-    if (member.roles.highest.position < target.roles.highest.position)
-      return errorEmbed(
-        interaction,
-        `You can't ban ${name}.`,
-        "The member has a higher role position than you."
-      );
-
+    errorCheck(PermissionsBitField.Flags.BanMembers, { interaction, user, action: "Ban" });
     const reason = interaction.options.getString("reason");
-    await target.ban({ reason: reason ?? undefined });
-    await modEmbed({ interaction, user, action: "Banned", reason });
+    await interaction.guild?.members.cache.get(user.id)?.ban({ reason: reason ?? undefined });
+    await modEmbed({ interaction, user, action: "Banned" }, reason);
   }
 }
