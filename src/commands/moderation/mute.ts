@@ -44,7 +44,8 @@ export default class Mute {
 
     await interaction.guild?.members.cache
       .get(user.id)
-      ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined });
+      ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined })
+      .catch(error => console.error(error));
 
     await modEmbed({ interaction, user, action: "Muted", duration }, reason);
   }

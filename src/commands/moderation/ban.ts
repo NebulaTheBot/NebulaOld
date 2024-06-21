@@ -26,7 +26,11 @@ export default class Ban {
     const user = interaction.options.getUser("user")!;
     errorCheck(PermissionsBitField.Flags.BanMembers, { interaction, user, action: "Ban" });
     const reason = interaction.options.getString("reason");
-    await interaction.guild?.members.cache.get(user.id)?.ban({ reason: reason ?? undefined });
+    await interaction.guild?.members.cache
+      .get(user.id)
+      ?.ban({ reason: reason ?? undefined })
+      .catch(error => console.error(error));
+
     await modEmbed({ interaction, user, action: "Banned" }, reason);
   }
 }

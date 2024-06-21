@@ -12,6 +12,7 @@ import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { getSetting } from "../../utils/database/settings";
 import { addModeration } from "../../utils/database/moderation";
+import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Warn {
   data: SlashCommandSubcommandBuilder;
@@ -30,72 +31,21 @@ export default class Warn {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
-    const members = guild.members.cache;
-    const member = members.get(interaction.member?.user.id!)!;
-    const target = members.get(user.id)!;
-    const name = user.displayName;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
-      return errorEmbed(
-        interaction,
-        "You can't execute this command.",
-        "You need the **Moderate Members** permission."
-      );
-
-    if (target === member) return errorEmbed(interaction, "You can't warn yourself.");
-    if (target.user.id === interaction.client.user.id)
-      return errorEmbed(interaction, "You can't warn Sokora.");
-
-    if (!target.manageable)
-      return errorEmbed(
-        interaction,
-        `You can't warn ${name}.`,
-        "The member has a higher role position than Sokora."
-      );
-
-    if (member.roles.highest.position < target.roles.highest.position)
-      return errorEmbed(
-        interaction,
-        `You can't warn ${name}.`,
-        "The member has a higher role position than you."
-      );
+    errorCheck(
+      PermissionsBitField.Flags.ModerateMembers,
+      { interaction, user, action: "Warn" },
+      "Moderate"
+    );
 
     const reason = interaction.options.getString("reason");
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`Warned ${name}.`)
-      .setDescription(
-        [
-          `**Moderator**: ${interaction.user.displayName}`,
-          `**Reason**: ${reason ?? "No reason provided"}`
-        ].join("\n")
-      )
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-
-    const logChannel = getSetting(guild.id, "moderation.channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
-    addModeration(guild.id, user.id, "WARN", member.id, reason ?? undefined);
-    await interaction.reply({ embeds: [embed] });
-
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (!dmChannel) return;
-    if (user.bot) return;
-    await dmChannel.send({
-      embeds: [embed.setTitle("You got warned.").setColor(genColor(0))]
-    });
+    addModeration(
+      guild.id,
+      user.id,
+      "WARN",
+      guild.members.cache.get(interaction.member?.user.id!)?.id!,
+      reason ?? undefined
+    );
+    modEmbed({ interaction, user, action: "Warned" }, reason);
   }
 }

@@ -18,7 +18,7 @@ type Options = {
   duration?: string | null;
 };
 
-export async function errorCheck(permission: bigint, options: Options) {
+export async function errorCheck(permission: bigint, options: Options, permissionAction?: string) {
   const { interaction, user, action, duration } = options;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
@@ -30,7 +30,7 @@ export async function errorCheck(permission: bigint, options: Options) {
     return errorEmbed(
       interaction,
       "You can't execute this command.",
-      `You need the **${action} Members** permission.`
+      `You need the **${permissionAction ?? action} Members** permission.`
     );
 
   if (target === member)
@@ -42,14 +42,14 @@ export async function errorCheck(permission: bigint, options: Options) {
   if (!target.manageable)
     return errorEmbed(
       interaction,
-      `You can't ${action} ${name}.`,
+      `You can't ${action.toLowerCase()} ${name}.`,
       "The member has a higher role position than Sokora."
     );
 
   if (member.roles.highest.position < target.roles.highest.position)
     return errorEmbed(
       interaction,
-      `You can't ${action} ${name}.`,
+      `You can't ${action.toLowerCase()} ${name}.`,
       "The member has a higher role position than you."
     );
 
@@ -57,12 +57,16 @@ export async function errorCheck(permission: bigint, options: Options) {
     if (!ms(duration) || ms(duration) > ms("28d"))
       return errorEmbed(
         interaction,
-        `You can't ${action} ${name}`,
+        `You can't ${action.toLowerCase()} ${name}`,
         "The duration is invalid or is above the 28 day limit."
       );
 
   if (member.id === guild.ownerId)
-    return errorEmbed(interaction, `You can't ban ${name}.`, "The member owns the server.");
+    return errorEmbed(
+      interaction,
+      `You can't ${action.toLowerCase()} ${name}.`,
+      "The member owns the server."
+    );
 }
 
 export async function modEmbed(options: Options, reason?: string | null) {
@@ -97,8 +101,11 @@ export async function modEmbed(options: Options, reason?: string | null) {
   }
 
   await interaction.reply({ embeds: [embed] });
+
+  const dmChannel = await user.createDM().catch(() => null);
+  if (!dmChannel) return;
   if (user.bot) return;
-  (await user.createDM())
+  await dmChannel
     .send({
       embeds: [embed.setTitle(`You got ${action.toLowerCase()}.`).setColor(genColor(0))]
     })
