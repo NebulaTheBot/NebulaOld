@@ -75,7 +75,7 @@ export default class Purge {
         ? await channel.bulkDelete(amount + 1, true)
         : await channel.bulkDelete(amount, true);
 
-    const logChannel = getSetting(guild.id, "moderation.channel");
+    const logChannel = getSetting(guild.id, "moderation", "channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

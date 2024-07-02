@@ -10,8 +10,8 @@ export default {
       if (author.bot) return;
 
       const guild = oldMessage.guild!;
-      const logUpdate = getSetting(guild.id, "moderation.logMessages");
-      const logChannel = getSetting(guild.id, "moderation.channel");
+      const logUpdate = getSetting(guild.id, "moderation", "log_messages");
+      const logChannel = getSetting(guild.id, "moderation", "channel");
       if (!logUpdate) return;
       if (!logChannel) return;
 

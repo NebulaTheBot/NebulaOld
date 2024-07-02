@@ -13,10 +13,10 @@ export default {
 
     async run(member: GuildMember) {
       const guildID = member.guild.id;
-      const id = getSetting(guildID, "welcome.channel");
+      const id = getSetting(guildID, "welcome", "channel");
       if (!id) return;
 
-      let text = getSetting(guildID, "welcome.goodbyeText");
+      let text = getSetting(guildID, "welcome", "goodbye_text");
       const user = member.user;
       const guild = member.guild;
       const channel = (await member.guild.channels.cache

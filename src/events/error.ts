@@ -9,7 +9,7 @@ export default {
     }
 
     async run(error: DiscordErrorData) {
-      console.error(error.message);
+      console.error(error);
     }
   }
 };

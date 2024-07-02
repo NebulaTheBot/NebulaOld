@@ -23,26 +23,26 @@ export default {
         for (const easterEggFile of readdirSync(eventsPath))
           new (
             await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())
-          ).default().run(message, ...message.content);
+          ).default().run(message);
       }
 
       // Levelling
-      if (!getSetting(guild.id, "levelling.enabled")) return;
+      if (!getSetting(guild.id, "levelling", "enabled")) return;
 
-      const level = getSetting(guild.id, "levelling.setLevel")!;
-      if (level != "") {
+      const level = getSetting(guild.id, "levelling", "set_level")!;
+      if (level != "" && level != null) {
         const newLevel = kominator(level);
         setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
-        setSetting(guild.id, "levelling.setLevel", "");
+        setSetting(guild.id, "levelling", "set_level", "");
       }
 
-      const blockedChannels = getSetting(guild.id, "levelling.blockChannels")!;
+      const blockedChannels = getSetting(guild.id, "levelling", "block_channels")!;
       if (blockedChannels != undefined)
         for (const channelID of blockedChannels.split(", "))
           if (message.channelId === channelID) return;
 
-      let expGain = getSetting(guild.id, "levelling.setXPGain")! ?? 2;
-      const multiplier = getSetting(guild.id, "levelling.addMultiplier")!;
+      let expGain = getSetting(guild.id, "levelling", "set_xp_gain")! ?? 2;
+      const multiplier = getSetting(guild.id, "levelling", "add_multiplier")!;
       if (multiplier != null) {
         const expMultiplier = kominator(multiplier);
 
@@ -54,13 +54,13 @@ export default {
       }
 
       // const cooldown = getSetting(guild.id, "levelling.setCooldown") ?? 4;
-      const levelChannelId = getSetting(guild.id, "levelling.channel");
+      const levelChannelId = getSetting(guild.id, "levelling", "channel");
       const [guildLevel, guildExp] = getLevel(guild.id, author.id);
       const [globalLevel, globalExp] = getLevel("0", author.id);
       const expUntilLevelup = 100 * 1.15 * (guildLevel + 1);
       const newLevelData = {
         level: guildLevel ?? 0,
-        exp: (guildExp ?? 0) + getSetting(guild.id, "levelling.setXPGain")! ?? 2
+        exp: (guildExp ?? 0) + getSetting(guild.id, "levelling", "set_xp_gain")! ?? 2
       };
       const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + 2 };
 

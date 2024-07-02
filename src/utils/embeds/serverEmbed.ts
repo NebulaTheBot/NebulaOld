@@ -19,7 +19,7 @@ type Options = {
 export async function serverEmbed(options: Options) {
   const { page, pages, guild } = options;
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;
-  const invite = getSetting(guild.id, "serverboard.inviteLink");
+  const invite = getSetting(guild.id, "serverboard", "invite_link");
   const members = guild.members.cache;
   const boosters = members.filter(member => member.premiumSince);
   const onlineMembers = members.filter(member =>

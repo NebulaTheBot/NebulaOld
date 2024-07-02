@@ -41,7 +41,7 @@ export default class Remove {
 
     const messageID = news.messageID;
     const newsChannel = (await guild.channels
-      .fetch(getSetting(guild.id, "news.channelID")! ?? interaction.channel?.id)
+      .fetch(getSetting(guild.id, "news", "channel_id")! ?? interaction.channel?.id)
       .catch(() => null)) as TextChannel;
 
     if (newsChannel) await newsChannel.messages.delete(messageID);

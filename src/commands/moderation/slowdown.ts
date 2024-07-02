@@ -82,7 +82,7 @@ export default class Slowdown {
     )
       await channel.setRateLimitPerUser(ms(time) / 1000, interaction.options.getString("reason")!);
 
-    const logChannel = getSetting(guild.id, "moderation.channel");
+    const logChannel = getSetting(guild.id, "moderation", "channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

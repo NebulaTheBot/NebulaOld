@@ -74,7 +74,7 @@ export default class Delwarn {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "moderation.channel");
+    const logChannel = getSetting(guild.id, "moderation", "channel");
     if (logChannel) {
       const channel = await guild.channels.cache
         .get(`${logChannel}`)

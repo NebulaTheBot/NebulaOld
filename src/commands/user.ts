@@ -77,20 +77,6 @@ export default class User {
       .setThumbnail(target.displayAvatarURL()!)
       .setColor(genColor(200));
 
-    imageColor(embed, undefined, target);
-    await interaction.reply({ embeds: [embed], components: [] });
-
-    if (!getSetting(`${guild.id}`, "levelling.enabled" || selectedUser.bot)) return;
-    const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
-    const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
-    if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
-    if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
-
-    const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
-    const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
-      "en-US"
-    );
-
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("general")
@@ -104,7 +90,20 @@ export default class User {
         .setStyle(ButtonStyle.Primary)
     );
 
-    await interaction.editReply({ embeds: [embed], components: [row] });
+    imageColor(embed, undefined, target);
+    await interaction.reply({ embeds: [embed], components: [row] });
+
+    if (!getSetting(`${guild.id}`, "levelling", "enabled") || selectedUser.bot) return;
+    const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
+    const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
+    if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
+    if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
+
+    const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
+    const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
+      "en-US"
+    );
+    //await interaction.editReply({ embeds: [embed], components: [row] });
     interaction.channel
       ?.createMessageComponentCollector({
         filter: i => i.user.id === interaction.user.id,
@@ -141,9 +140,9 @@ export default class User {
         imageColor(levelEmbed, undefined, target);
         switch (i.customId) {
           case "general":
-            await interaction.editReply({ embeds: [embed], components: [row] });
+            await interaction.editReply({ embeds: [embed], components: [row] }); break;
           case "level":
-            await interaction.editReply({ embeds: [levelEmbed], components: [row] });
+            await interaction.editReply({ embeds: [levelEmbed], components: [row] }); break;
         }
 
         i.update({});
