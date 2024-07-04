@@ -66,7 +66,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     case "TEXT":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
-      return (res[0].value != null && res[0].value != "" && res[0].value != "false" ? "true" : "false") as TypeOfKey<K>;
+      return (res[0].value != null && res[0].value != "" && res[0].value != "false" && res[0].value != "0") as TypeOfKey<K>;
     case "INTEGER":
       return parseInt(res[0].value) as TypeOfKey<K>;
     default:

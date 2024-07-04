@@ -76,36 +76,35 @@ export default class User {
       .setFooter({ text: `User ID: ${target.id}` })
       .setThumbnail(target.displayAvatarURL()!)
       .setColor(genColor(200));
+    
+    const components = [];
 
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("general")
-        .setLabel("•  General")
-        .setEmoji("📃")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("level")
-        .setLabel("•  Level")
-        .setEmoji("⚡")
-        .setStyle(ButtonStyle.Primary)
-    );
+    if (getSetting(`${guild.id}`, "levelling", "enabled") && !selectedUser.bot) {
+      const row = new ActionRowBuilder<ButtonBuilder>();
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("general")
+          .setLabel("•  General")
+          .setEmoji("📃")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("level")
+          .setLabel("•  Level")
+          .setEmoji("⚡")
+          .setStyle(ButtonStyle.Primary)
+      );
 
-    imageColor(embed, undefined, target);
-    await interaction.reply({ embeds: [embed], components: [row] });
+      const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
+      const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
+      if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
+      if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
 
-    if (!getSetting(`${guild.id}`, "levelling", "enabled") || selectedUser.bot) return;
-    const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
-    const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
-    if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
-    if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
-
-    const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
-    const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
-      "en-US"
-    );
-    //await interaction.editReply({ embeds: [embed], components: [row] });
-    interaction.channel
-      ?.createMessageComponentCollector({
+      const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
+      const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
+        "en-US"
+      );
+      
+      interaction.channel?.createMessageComponentCollector({
         filter: i => i.user.id === interaction.user.id,
         time: 60000
       })
@@ -147,5 +146,12 @@ export default class User {
 
         i.update({});
       });
+
+      components.push(row);
+    }
+
+    imageColor(embed, undefined, target);
+    await interaction.reply({ embeds: [embed], components: components });
+    
   }
 }
