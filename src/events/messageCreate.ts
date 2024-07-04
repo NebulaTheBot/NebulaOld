@@ -29,20 +29,20 @@ export default {
       // Levelling
       if (!getSetting(guild.id, "levelling", "enabled")) return;
 
-      const level = getSetting(guild.id, "levelling", "set_level")!;
+      const level = getSetting(guild.id, "levelling", "set_level")! as string;
       if (level != "" && level != null) {
         const newLevel = kominator(level);
         setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
         setSetting(guild.id, "levelling", "set_level", "");
       }
 
-      const blockedChannels = getSetting(guild.id, "levelling", "block_channels")!;
+      const blockedChannels = getSetting(guild.id, "levelling", "block_channels")! as string;
       if (blockedChannels != undefined)
-        for (const channelID of blockedChannels.split(", "))
+        for (const channelID of kominator(blockedChannels))
           if (message.channelId === channelID) return;
 
-      let expGain = getSetting(guild.id, "levelling", "set_xp_gain")! ?? 2;
-      const multiplier = getSetting(guild.id, "levelling", "add_multiplier")!;
+      let expGain = (getSetting(guild.id, "levelling", "set_xp_gain")! as number) ?? 2;
+      const multiplier = getSetting(guild.id, "levelling", "add_multiplier")! as string;
       if (multiplier != null) {
         const expMultiplier = kominator(multiplier);
 
@@ -58,10 +58,7 @@ export default {
       const [guildLevel, guildExp] = getLevel(guild.id, author.id);
       const [globalLevel, globalExp] = getLevel("0", author.id);
       const expUntilLevelup = 100 * 1.15 * (guildLevel + 1);
-      const newLevelData = {
-        level: guildLevel ?? 0,
-        exp: (guildExp ?? 0) + getSetting(guild.id, "levelling", "set_xp_gain")! ?? 2
-      };
+      const newLevelData = { level: guildLevel ?? 0, exp: (guildExp ?? 0) + expGain };
       const globalNewLevelData = { level: globalLevel ?? 0, exp: (globalExp ?? 0) + 2 };
 
       if (guildExp < expUntilLevelup - 1) {

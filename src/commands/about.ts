@@ -36,7 +36,7 @@ export default class About {
         {
           name: "🌌 • Entities involved",
           value: [
-            "**Head developer**: Goos",
+            "**Founder**: Goos",
             "**Developers**: Dimkauzh, Froxcey, Golem64, Spectrum, Nikkerudon, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI, Trynera",

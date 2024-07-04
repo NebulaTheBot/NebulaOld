@@ -55,14 +55,14 @@ export default class Delwarn {
     if (!target.manageable)
       return errorEmbed(
         interaction,
-        `You can't delete a warn from ${name}.`,
+        `You can't remove a warn from ${name}.`,
         "The member has a higher role position than Sokora."
       );
 
     if (member.roles.highest.position < target.roles.highest.position)
       return errorEmbed(
         interaction,
-        `You can't delete a warn from ${name}`,
+        `You can't remove a warn from ${name}.`,
         "The member has a higher role position than you."
       );
 
