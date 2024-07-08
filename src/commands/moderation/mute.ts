@@ -4,8 +4,8 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import ms from "ms";
-import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Mute {
   data: SlashCommandSubcommandBuilder;
@@ -32,7 +32,14 @@ export default class Mute {
     const duration = interaction.options.getString("duration")!;
     const reason = interaction.options.getString("reason");
 
-    errorCheck(PermissionsBitField.Flags.ModerateMembers, { interaction, user, action: "Mute" });
+    await errorCheck(
+      PermissionsBitField.Flags.ModerateMembers,
+      { interaction, user, action: "Mute" },
+      true,
+      true,
+      "Moderate Members"
+    );
+
     if (!ms(duration) || ms(duration) > ms("28d"))
       return errorEmbed(
         interaction,

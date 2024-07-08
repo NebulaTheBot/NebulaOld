@@ -1,16 +1,8 @@
 import {
   SlashCommandSubcommandBuilder,
-  EmbedBuilder,
   PermissionsBitField,
-  TextChannel,
-  DMChannel,
-  ChannelType,
-  type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
 import { addModeration } from "../../utils/database/moderation";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
@@ -31,14 +23,16 @@ export default class Warn {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
+    const reason = interaction.options.getString("reason");
 
-    errorCheck(
+    await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Warn" },
-      "Moderate"
+      false,
+      true,
+      "Moderate Members"
     );
 
-    const reason = interaction.options.getString("reason");
     addModeration(
       guild.id,
       user.id,
@@ -46,6 +40,7 @@ export default class Warn {
       guild.members.cache.get(interaction.member?.user.id!)?.id!,
       reason ?? undefined
     );
+
     modEmbed({ interaction, user, action: "Warned" }, reason);
   }
 }

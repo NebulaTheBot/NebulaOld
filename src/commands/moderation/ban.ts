@@ -3,7 +3,7 @@ import {
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { modEmbed, errorCheck } from "../../utils/embeds/modEmbed";
+import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -21,7 +21,15 @@ export default class Ban {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
-    errorCheck(PermissionsBitField.Flags.BanMembers, { interaction, user, action: "Ban" });
+
+    await errorCheck(
+      PermissionsBitField.Flags.BanMembers,
+      { interaction, user, action: "Ban" },
+      true,
+      true,
+      "Ban Members"
+    );
+
     const reason = interaction.options.getString("reason");
     await interaction.guild?.members.cache
       .get(user.id)

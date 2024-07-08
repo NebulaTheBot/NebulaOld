@@ -2,15 +2,13 @@ import {
   PermissionsBitField,
   EmbedBuilder,
   SlashCommandSubcommandBuilder,
-  TextChannel,
   DMChannel,
-  ChannelType,
-  type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
+import { logChannel } from "../../utils/logChannel";
+import { errorCheck } from "../../utils/embeds/modEmbed";
 
 export default class Unban {
   data: SlashCommandSubcommandBuilder;
@@ -34,12 +32,12 @@ export default class Unban {
       .map(user => user.user)
       .filter(user => user.id === id)[0]!;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
-      return errorEmbed(
-        interaction,
-        "You can't execute this command.",
-        "You need the **Ban Members** permission."
-      );
+    await errorCheck(
+      PermissionsBitField.Flags.BanMembers,
+      { interaction, user: target, action: "Unban" },
+      false,
+      "Ban Members"
+    );
 
     if (target == undefined)
       return errorEmbed(interaction, "You can't unban this user.", "The user was never banned.");
@@ -52,20 +50,7 @@ export default class Unban {
       .setFooter({ text: `User ID: ${id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     await guild.members.unban(id);
     await interaction.reply({ embeds: [embed] });
 

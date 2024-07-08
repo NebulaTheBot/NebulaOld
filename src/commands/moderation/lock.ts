@@ -34,11 +34,11 @@ export default class Lock {
     const guild = interaction.guild!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageChannels))
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageRoles))
       return errorEmbed(
         interaction,
         "You can't execute this command",
-        "You need the **Manage Channels** permission."
+        "You need the **Manage Roles** permission."
       );
 
     const channelOption = interaction.options.getChannel("channel")!;

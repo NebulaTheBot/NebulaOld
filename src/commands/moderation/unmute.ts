@@ -2,15 +2,11 @@ import {
   SlashCommandSubcommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-  TextChannel,
   DMChannel,
-  ChannelType,
-  type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
 import { logChannel } from "../../utils/logChannel";
 
 export default class Unmute {

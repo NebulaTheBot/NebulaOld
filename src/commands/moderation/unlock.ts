@@ -3,13 +3,11 @@ import {
   EmbedBuilder,
   PermissionsBitField,
   SlashCommandSubcommandBuilder,
-  TextChannel,
-  type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { getSetting } from "../../utils/database/settings";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { logChannel } from "../../utils/logChannel";
 
 export default class Unlock {
   data: SlashCommandSubcommandBuilder;
@@ -34,11 +32,11 @@ export default class Unlock {
     const guild = interaction.guild!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageChannels))
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageRoles))
       return errorEmbed(
         interaction,
         "You can't execute this command",
-        "You need the **Manage Channels** permission."
+        "You need the **Manage Roles** permission."
       );
 
     const channelOption = interaction.options.getChannel("channel")!;
@@ -78,20 +76,7 @@ export default class Unlock {
         })
         .catch(error => console.error(error));
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     await interaction.reply({ embeds: [embed] });
   }
 }

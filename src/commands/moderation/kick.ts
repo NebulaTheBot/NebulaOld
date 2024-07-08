@@ -21,7 +21,15 @@ export default class Kick {
 
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
-    errorCheck(PermissionsBitField.Flags.KickMembers, { interaction, user, action: "Kick" });
+
+    await errorCheck(
+      PermissionsBitField.Flags.KickMembers,
+      { interaction, user, action: "Kick" },
+      true,
+      true,
+      "Kick Members"
+    );
+
     const reason = interaction.options.getString("reason");
     await interaction.guild?.members.cache
       .get(user.id)

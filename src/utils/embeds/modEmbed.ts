@@ -11,21 +11,37 @@ type Options = {
   duration?: string | null;
 };
 
-export async function errorCheck(permission: bigint, options: Options, permissionAction?: string) {
+export async function errorCheck(
+  permission: bigint,
+  options: Options,
+  botError: boolean,
+  allErrors: boolean,
+  permissionAction: string
+) {
   const { interaction, user, action } = options;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
   const member = members.get(interaction.member?.user.id!)!;
+  const client = members.get(interaction.client.user.id!)!;
   const target = members.get(user.id)!;
   const name = user.displayName;
+
+  if (botError)
+    if (!client.permissions.has(permission))
+      return errorEmbed(
+        interaction,
+        "The bot can't execute this command.",
+        `The bot is missing the **${permissionAction}** permission.`
+      );
 
   if (!member.permissions.has(permission))
     return errorEmbed(
       interaction,
       "You can't execute this command.",
-      `You need the **${permissionAction ?? action} Members** permission.`
+      `You're missing the **${permissionAction} Members** permission.`
     );
 
+  if (!allErrors) return;
   if (target === member)
     return errorEmbed(interaction, `You can't ${action.toLowerCase()} yourself.`);
 
