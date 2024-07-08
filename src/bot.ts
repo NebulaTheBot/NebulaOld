@@ -1,10 +1,10 @@
-import { Client, ActivityType } from "discord.js";
+import { ActivityType, Client } from "discord.js";
 import Commands from "./handlers/commands";
 import Events from "./handlers/events";
 
 const client = new Client({
   presence: {
-    activities: [{ name: "with /settings!", type: ActivityType.Playing }]
+    activities: [{ name: "your feedback!", type: ActivityType.Listening }]
   },
   intents: [
     "Guilds",

@@ -88,7 +88,12 @@ export default class Delwarn {
       if (channel) await channel.send({ embeds: [embed] });
     }
 
-    removeModeration(guild.id, `${id}`);
+    try {
+      removeModeration(guild.id, `${id}`);
+    } catch (error) {
+      console.error(error);
+    }
+
     await interaction.reply({ embeds: [embed] });
 
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;

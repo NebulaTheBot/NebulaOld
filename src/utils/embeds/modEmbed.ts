@@ -1,14 +1,7 @@
-import {
-  ChannelType,
-  EmbedBuilder,
-  TextChannel,
-  type Channel,
-  type ChatInputCommandInteraction,
-  type User
-} from "discord.js";
+import { EmbedBuilder, type ChatInputCommandInteraction, type User } from "discord.js";
 import ms from "ms";
 import { genColor } from "../colorGen";
-import { getSetting } from "../database/settings";
+import { logChannel } from "../logChannel";
 import { errorEmbed } from "./errorEmbed";
 
 type Options = {
@@ -19,7 +12,7 @@ type Options = {
 };
 
 export async function errorCheck(permission: bigint, options: Options, permissionAction?: string) {
-  const { interaction, user, action, duration } = options;
+  const { interaction, user, action } = options;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
   const member = members.get(interaction.member?.user.id!)!;
@@ -53,14 +46,6 @@ export async function errorCheck(permission: bigint, options: Options, permissio
       "The member has a higher role position than you."
     );
 
-  if (duration)
-    if (!ms(duration) || ms(duration) > ms("28d"))
-      return errorEmbed(
-        interaction,
-        `You can't ${action.toLowerCase()} ${name}`,
-        "The duration is invalid or is above the 28 day limit."
-      );
-
   if (member.id === guild.ownerId)
     return errorEmbed(
       interaction,
@@ -86,20 +71,7 @@ export async function modEmbed(options: Options, reason?: string | null) {
     .setFooter({ text: `User ID: ${user.id}` })
     .setColor(genColor(100));
 
-  const logChannel = getSetting(guild.id, "moderation", "channel");
-  if (logChannel) {
-    const channel = await guild.channels.cache
-      .get(`${logChannel}`)
-      ?.fetch()
-      .then((channel: Channel) => {
-        if (channel.type != ChannelType.GuildText) return null;
-        return channel as TextChannel;
-      })
-      .catch(() => null);
-
-    if (channel) await channel.send({ embeds: [embed] });
-  }
-
+  await logChannel(guild, embed);
   await interaction.reply({ embeds: [embed] });
 
   const dmChannel = await user.createDM().catch(() => null);

@@ -48,7 +48,7 @@ export default class Lock {
       return errorEmbed(
         interaction,
         "You can't execute this command",
-        "The channel is already locked"
+        "The channel is already locked."
       );
 
     const embed = new EmbedBuilder()
@@ -67,15 +67,16 @@ export default class Lock {
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice
     )
-    
-    channel.permissionOverwrites.create(interaction.guild!.id, {
-      SendMessages: false,
-      SendMessagesInThreads: false,
-      CreatePublicThreads: false,
-      CreatePrivateThreads: false,
-      UseApplicationCommands: false,
-      UseEmbeddedActivities: false
-    });
+      channel.permissionOverwrites
+        .create(interaction.guild!.id, {
+          SendMessages: false,
+          SendMessagesInThreads: false,
+          CreatePublicThreads: false,
+          CreatePrivateThreads: false,
+          UseApplicationCommands: false,
+          UseEmbeddedActivities: false
+        })
+        .catch(error => console.error(error));
 
     const logChannel = getSetting(guild.id, "moderation", "channel");
     if (logChannel) {

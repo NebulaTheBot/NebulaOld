@@ -5,6 +5,7 @@ import {
 } from "discord.js";
 import ms from "ms";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class Mute {
   data: SlashCommandSubcommandBuilder;
@@ -31,12 +32,13 @@ export default class Mute {
     const duration = interaction.options.getString("duration")!;
     const reason = interaction.options.getString("reason");
 
-    errorCheck(PermissionsBitField.Flags.MuteMembers, {
-      interaction,
-      user,
-      action: "Mute",
-      duration
-    });
+    errorCheck(PermissionsBitField.Flags.ModerateMembers, { interaction, user, action: "Mute" });
+    if (!ms(duration) || ms(duration) > ms("28d"))
+      return errorEmbed(
+        interaction,
+        `You can't mute ${user.displayName}.`,
+        "The duration is invalid or is above the 28 day limit."
+      );
 
     const time = new Date(
       Date.parse(new Date().toISOString()) + Date.parse(new Date(ms(duration)).toISOString())

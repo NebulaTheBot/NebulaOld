@@ -1,12 +1,15 @@
 {
   "name": "sokora",
   "description": "Welcome to Sokora, the multipurpose, multiplatform bot.",
-  "contributors": ["The Sokora team", "The GitHub contributors"],
+  "contributors": [
+    "The Sokora team",
+    "The GitHub contributors"
+  ],
   "version": "0.1.0",
   "main": "./src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun ./src/bot.ts"
+    "start": "bun ./src/index.ts"
   },
   "dependencies": {
     "discord.js": "^14.15.3",

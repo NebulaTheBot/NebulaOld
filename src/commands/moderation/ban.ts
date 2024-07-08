@@ -15,9 +15,6 @@ export default class Ban {
         user.setName("user").setDescription("The user that you want to ban.").setRequired(true)
       )
       .addStringOption(string =>
-        string.setName("duration").setDescription("The duration of the ban (e.g 30m, 1d, 2h).")
-      )
-      .addStringOption(string =>
         string.setName("reason").setDescription("The reason for the ban.")
       );
   }

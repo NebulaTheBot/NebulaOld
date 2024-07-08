@@ -11,6 +11,7 @@ import {
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { getSetting } from "../../utils/database/settings";
+import { logChannel } from "../../utils/logChannel";
 
 export default class Unmute {
   data: SlashCommandSubcommandBuilder;
@@ -29,7 +30,7 @@ export default class Unmute {
     if (
       !members
         .get(interaction.member!.user.id)!
-        .permissions.has(PermissionsBitField.Flags.MuteMembers)
+        .permissions.has(PermissionsBitField.Flags.ModerateMembers)
     )
       return errorEmbed(
         interaction,
@@ -54,20 +55,7 @@ export default class Unmute {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     await members.get(user.id)!.edit({ communicationDisabledUntil: null });
     await interaction.reply({ embeds: [embed] });
 

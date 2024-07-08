@@ -1,9 +1,9 @@
 import {
   EmbedBuilder,
-  type Role,
-  type TextChannel,
+  type ChatInputCommandInteraction,
   type Guild,
-  type ChatInputCommandInteraction
+  type Role,
+  type TextChannel
 } from "discord.js";
 import { genColor } from "./colorGen";
 import { get, updateNews } from "./database/news";
@@ -14,7 +14,7 @@ export async function sendChannelNews(
   id: string,
   interaction: ChatInputCommandInteraction,
   title?: string,
-  body?: string,
+  body?: string
 ) {
   const news = get(id)!;
   const role = getSetting(guild.id, "news", "role_id");

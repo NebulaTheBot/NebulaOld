@@ -1,15 +1,15 @@
 import {
-  SlashCommandSubcommandBuilder,
+  ChannelType,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
+  SlashCommandSubcommandBuilder,
   TextChannel,
   type Channel,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { getSetting } from "../../utils/database/settings";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class Unlock {
   data: SlashCommandSubcommandBuilder;
@@ -45,13 +45,12 @@ export default class Unlock {
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
 
     if (channel.permissionsFor(guild.id)?.has("SendMessages"))
-        return errorEmbed(
-          interaction,
-          "You can't execute this command",
-          "The channel is already unlocked"
-        );
+      return errorEmbed(
+        interaction,
+        "You can't execute this command.",
+        "The channel is not locked."
+      );
 
-    
     const embed = new EmbedBuilder()
       .setTitle(`Unlocked a channel`)
       .setDescription(
@@ -68,15 +67,16 @@ export default class Unlock {
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice
     )
-      
-    channel.permissionOverwrites.create(interaction.guild!.id, {
-      SendMessages: null,
-      SendMessagesInThreads: null,
-      CreatePublicThreads: null,
-      CreatePrivateThreads: null,
-      UseApplicationCommands: null,
-      UseEmbeddedActivities: null
-    });
+      channel.permissionOverwrites
+        .create(interaction.guild!.id, {
+          SendMessages: null,
+          SendMessagesInThreads: null,
+          CreatePublicThreads: null,
+          CreatePrivateThreads: null,
+          UseApplicationCommands: null,
+          UseEmbeddedActivities: null
+        })
+        .catch(error => console.error(error));
 
     const logChannel = getSetting(guild.id, "moderation", "channel");
     if (logChannel) {
