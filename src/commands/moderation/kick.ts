@@ -36,6 +36,6 @@ export default class Kick {
       ?.kick(reason ?? undefined)
       .catch(error => console.error(error));
 
-    modEmbed({ interaction, user, action: "Kicked" }, reason);
+    await modEmbed({ interaction, user, action: "Kicked" }, reason);
   }
 }

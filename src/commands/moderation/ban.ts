@@ -4,6 +4,7 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -13,6 +14,9 @@ export default class Ban {
       .setDescription("Bans a user.")
       .addUserOption(user =>
         user.setName("user").setDescription("The user that you want to ban.").setRequired(true)
+      )
+      .addStringOption(string =>
+        string.setName("duration").setDescription("The duration of the ban (e.g 30m, 1d, 2h).")
       )
       .addStringOption(string =>
         string.setName("reason").setDescription("The reason for the ban.")

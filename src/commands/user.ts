@@ -1,15 +1,15 @@
 import {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ButtonInteraction,
   ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  EmbedBuilder,
+  SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
-import { getSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
+import { getSetting } from "../utils/database/settings";
 import { imageColor } from "../utils/imageColor";
 
 export default class User {
@@ -29,7 +29,7 @@ export default class User {
       .filter(member => member.user.id === id)
       .map(user => user)[0]!;
 
-    const selectedUser = target.user!;
+    const selectedUser = await target.user.fetch();
     let serverInfo = [`Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`];
     const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
     const memberRoles = [...guildRoles].sort(
@@ -75,8 +75,10 @@ export default class User {
       )
       .setFooter({ text: `User ID: ${target.id}` })
       .setThumbnail(target.displayAvatarURL()!)
-      .setColor(genColor(200));
-    
+      .setColor(
+        selectedUser.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200)
+      );
+
     const components = [];
 
     if (getSetting(`${guild.id}`, "levelling", "enabled") && !selectedUser.bot) {
@@ -99,59 +101,63 @@ export default class User {
       if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
       if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
 
-      const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
+      const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString(
+        "en-US"
+      );
       const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
         "en-US"
       );
-      
-      interaction.channel?.createMessageComponentCollector({
-        filter: i => i.user.id === interaction.user.id,
-        time: 60000
-      })
-      .on("collect", async (i: ButtonInteraction) => {
-        const levelEmbed = new EmbedBuilder()
-          .setAuthor({
-            name: `•  ${target.nickname ?? selectedUser.displayName}`,
-            iconURL: target.displayAvatarURL()
-          })
-          .setFields(
-            {
-              name: `⚡ • Guild level ${guildLevel ?? 0}`,
-              value: [
-                `**${guildExp.toLocaleString("en-US") ?? 0}/${nextLevelExp}** EXP`,
-                `**Next level**: ${(guildLevel ?? 0) + 1}`
-              ].join("\n"),
-              inline: true
-            },
-            {
-              name: `⛈️ • Global level ${globalLevel ?? 0}`,
-              value: [
-                `**${globalExp.toLocaleString("en-US") ?? 0}/${globalNextLevelExp}** EXP`,
-                `**Next level**: ${(globalLevel ?? 0) + 1}`
-              ].join("\n"),
-              inline: true
-            }
-          )
-          .setFooter({ text: `User ID: ${target.id}` })
-          .setThumbnail(target.displayAvatarURL())
-          .setColor(genColor(200));
 
-        imageColor(levelEmbed, undefined, target);
-        switch (i.customId) {
-          case "general":
-            await interaction.editReply({ embeds: [embed], components: [row] }); break;
-          case "level":
-            await interaction.editReply({ embeds: [levelEmbed], components: [row] }); break;
-        }
+      interaction.channel
+        ?.createMessageComponentCollector({
+          filter: i => i.user.id === interaction.user.id,
+          time: 60000
+        })
+        .on("collect", async (i: ButtonInteraction) => {
+          const levelEmbed = new EmbedBuilder()
+            .setAuthor({
+              name: `•  ${target.nickname ?? selectedUser.displayName}`,
+              iconURL: target.displayAvatarURL()
+            })
+            .setFields(
+              {
+                name: `⚡ • Guild level ${guildLevel ?? 0}`,
+                value: [
+                  `**${guildExp.toLocaleString("en-US") ?? 0}/${nextLevelExp}** EXP`,
+                  `**Next level**: ${(guildLevel ?? 0) + 1}`
+                ].join("\n"),
+                inline: true
+              },
+              {
+                name: `⛈️ • Global level ${globalLevel ?? 0}`,
+                value: [
+                  `**${globalExp.toLocaleString("en-US") ?? 0}/${globalNextLevelExp}** EXP`,
+                  `**Next level**: ${(globalLevel ?? 0) + 1}`
+                ].join("\n"),
+                inline: true
+              }
+            )
+            .setFooter({ text: `User ID: ${target.id}` })
+            .setThumbnail(target.displayAvatarURL())
+            .setColor(
+              selectedUser.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200)
+            );
 
-        i.update({});
-      });
+          switch (i.customId) {
+            case "general":
+              await interaction.editReply({ embeds: [embed], components: [row] });
+              break;
+            case "level":
+              await interaction.editReply({ embeds: [levelEmbed], components: [row] });
+              break;
+          }
+
+          i.update({});
+        });
 
       components.push(row);
     }
 
-    imageColor(embed, undefined, target);
     await interaction.reply({ embeds: [embed], components: components });
-    
   }
 }
