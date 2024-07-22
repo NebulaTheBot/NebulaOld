@@ -11,14 +11,20 @@ type Options = {
   duration?: string | null;
 };
 
+type ErrorOptions = {
+  allErrors: boolean;
+  botError: boolean;
+  ownerError: boolean;
+};
+
 export async function errorCheck(
   permission: bigint,
   options: Options,
-  botError: boolean,
-  allErrors: boolean,
+  errorOptions: ErrorOptions,
   permissionAction: string
 ) {
   const { interaction, user, action } = options;
+  const { allErrors, botError, ownerError } = errorOptions;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
   const member = members.get(interaction.member?.user.id!)!;
@@ -62,15 +68,17 @@ export async function errorCheck(
       "The member has a higher role position than you."
     );
 
-  if (member.id === guild.ownerId)
-    return errorEmbed(
-      interaction,
-      `You can't ${action.toLowerCase()} ${name}.`,
-      "The member owns the server."
-    );
+  if (ownerError) {
+    if (member.id === guild.ownerId)
+      return errorEmbed(
+        interaction,
+        `You can't ${action.toLowerCase()} ${name}.`,
+        "The member owns the server."
+      );
+  }
 }
 
-export async function modEmbed(options: Options, reason?: string | null) {
+export async function modEmbed(options: Options, reason?: string | null, date?: boolean) {
   const { interaction, user, action, duration } = options;
   const guild = interaction.guild!;
   const name = user.displayName;
@@ -78,6 +86,7 @@ export async function modEmbed(options: Options, reason?: string | null) {
   const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
   if (reason) generalValues.push(`**Reason**: ${reason}`);
+  if (date) generalValues.push(`**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`);
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })

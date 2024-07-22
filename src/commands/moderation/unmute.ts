@@ -1,13 +1,10 @@
 import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
   PermissionsBitField,
-  DMChannel,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { logChannel } from "../../utils/logChannel";
+import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Unmute {
   data: SlashCommandSubcommandBuilder;
@@ -21,43 +18,20 @@ export default class Unmute {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
-    const guild = interaction.guild!;
-    const members = guild.members.cache!;
-    if (
-      !members
-        .get(interaction.member!.user.id)!
-        .permissions.has(PermissionsBitField.Flags.ModerateMembers)
-    )
-      return errorEmbed(
-        interaction,
-        "You can't execute this command.",
-        "You need the **Mute Members** permission."
-      );
-
     const user = interaction.options.getUser("user")!;
-    if (members.get(user.id)?.communicationDisabledUntil === null)
+    const target = interaction.guild?.members.cache.get(user.id)!;
+
+    errorCheck(
+      PermissionsBitField.Flags.ModerateMembers,
+      { interaction, user, action: "Unmute" },
+      { allErrors: false, botError: true, ownerError: false },
+      "Moderate Members"
+    );
+
+    if (target.communicationDisabledUntil === null)
       return errorEmbed(interaction, "You can't unmute this user.", "The user was never muted.");
 
-    const embed = new EmbedBuilder()
-      .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
-      .setTitle(`Unmuted ${user.displayName}.`)
-      .setDescription(
-        [
-          `**Moderator**: ${interaction.user.displayName}`,
-          `**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`
-        ].join("\n")
-      )
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `User ID: ${user.id}` })
-      .setColor(genColor(100));
-
-    await logChannel(guild, embed);
-    await members.get(user.id)!.edit({ communicationDisabledUntil: null });
-    await interaction.reply({ embeds: [embed] });
-
-    const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
-    if (!dmChannel) return;
-    if (user.bot) return;
-    await dmChannel.send({ embeds: [embed.setTitle("You got unmuted.")] });
+    await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
+    await modEmbed({ interaction, user, action: "Unmuted" }, undefined, true);
   }
 }

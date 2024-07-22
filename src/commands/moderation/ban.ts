@@ -4,7 +4,6 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -29,8 +28,7 @@ export default class Ban {
     await errorCheck(
       PermissionsBitField.Flags.BanMembers,
       { interaction, user, action: "Ban" },
-      true,
-      true,
+      { allErrors: true, botError: true, ownerError: true },
       "Ban Members"
     );
 

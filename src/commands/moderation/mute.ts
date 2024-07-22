@@ -35,8 +35,7 @@ export default class Mute {
     await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Mute" },
-      true,
-      true,
+      { allErrors: true, botError: true, ownerError: true },
       "Moderate Members"
     );
 

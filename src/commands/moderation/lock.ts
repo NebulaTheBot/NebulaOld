@@ -1,15 +1,13 @@
 import {
-  SlashCommandSubcommandBuilder,
+  ChannelType,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
-  TextChannel,
-  type Channel,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
+import { logChannel } from "../../utils/logChannel";
 
 export default class Lock {
   data: SlashCommandSubcommandBuilder;
@@ -78,20 +76,7 @@ export default class Lock {
         })
         .catch(error => console.error(error));
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     await interaction.reply({ embeds: [embed] });
   }
 }

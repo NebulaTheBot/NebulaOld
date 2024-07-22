@@ -1,16 +1,14 @@
 import {
-  SlashCommandSubcommandBuilder,
+  ChannelType,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
-  TextChannel,
-  type Channel,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
+import ms from "ms";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
-import ms from "ms";
+import { logChannel } from "../../utils/logChannel";
 
 export default class Slowdown {
   data: SlashCommandSubcommandBuilder;
@@ -47,7 +45,7 @@ export default class Slowdown {
     const time = interaction.options.getString("time")!;
     const member = guild.members.cache.get(interaction.member?.user.id!)!;
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+    if (!member.permissions.has(PermissionsBitField.Flags.ManageChannels))
       return errorEmbed(
         interaction,
         "You can't execute this command",
@@ -80,22 +78,11 @@ export default class Slowdown {
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice
     )
-      await channel.setRateLimitPerUser(ms(time) / 1000, interaction.options.getString("reason")!);
+      await channel
+        .setRateLimitPerUser(ms(time) / 1000, interaction.options.getString("reason")!)
+        .catch(error => console.error(error));
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     await interaction.reply({ embeds: [embed] });
   }
 }

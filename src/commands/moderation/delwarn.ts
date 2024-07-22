@@ -1,17 +1,15 @@
 import {
-  SlashCommandSubcommandBuilder,
+  DMChannel,
   EmbedBuilder,
   PermissionsBitField,
-  TextChannel,
-  DMChannel,
-  ChannelType,
-  type Channel,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { listUserModeration, removeModeration } from "../../utils/database/moderation";
-import { getSetting } from "../../utils/database/settings";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { errorCheck } from "../../utils/embeds/modEmbed";
+import { logChannel } from "../../utils/logChannel";
 
 export default class Delwarn {
   data: SlashCommandSubcommandBuilder;
@@ -33,38 +31,20 @@ export default class Delwarn {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
-    const members = guild.members.cache;
-    const member = members.get(interaction.member?.user.id!)!;
-    const target = members.get(user.id)!;
     const name = user.displayName;
     const id = interaction.options.getNumber("id", true);
     const warns = listUserModeration(guild.id, user.id, "WARN");
     const newWarns = warns.filter(warn => warn.id !== `${id}`);
 
-    if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
-      return errorEmbed(
-        interaction,
-        "You can't execute this command.",
-        "You need the **Moderate Members** permission."
-      );
+    await errorCheck(
+      PermissionsBitField.Flags.ModerateMembers,
+      { interaction, user, action: "Remove a warn" },
+      { allErrors: true, botError: false, ownerError: false },
+      "Moderate Members"
+    );
 
-    if (target === member) return errorEmbed(interaction, "You can't remove a warn from yourself.");
     if (newWarns.length === warns.length)
       return errorEmbed(interaction, `There is no warn with the id of ${id}.`);
-
-    if (!target.manageable)
-      return errorEmbed(
-        interaction,
-        `You can't remove a warn from ${name}.`,
-        "The member has a higher role position than Sokora."
-      );
-
-    if (member.roles.highest.position < target.roles.highest.position)
-      return errorEmbed(
-        interaction,
-        `You can't remove a warn from ${name}.`,
-        "The member has a higher role position than you."
-      );
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
@@ -74,20 +54,7 @@ export default class Delwarn {
       .setFooter({ text: `User ID: ${user.id}` })
       .setColor(genColor(100));
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     try {
       removeModeration(guild.id, `${id}`);
     } catch (error) {

@@ -1,6 +1,6 @@
 import {
-  SlashCommandSubcommandBuilder,
   PermissionsBitField,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { addModeration } from "../../utils/database/moderation";
@@ -28,19 +28,22 @@ export default class Warn {
     await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Warn" },
-      false,
-      true,
+      { allErrors: true, botError: false, ownerError: true },
       "Moderate Members"
     );
 
-    addModeration(
-      guild.id,
-      user.id,
-      "WARN",
-      guild.members.cache.get(interaction.member?.user.id!)?.id!,
-      reason ?? undefined
-    );
+    try {
+      addModeration(
+        guild.id,
+        user.id,
+        "WARN",
+        guild.members.cache.get(interaction.member?.user.id!)?.id!,
+        reason ?? undefined
+      );
+    } catch (error) {
+      console.error(error);
+    }
 
-    modEmbed({ interaction, user, action: "Warned" }, reason);
+    await modEmbed({ interaction, user, action: "Warned" }, reason);
   }
 }

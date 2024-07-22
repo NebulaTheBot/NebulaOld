@@ -1,15 +1,13 @@
 import {
-  SlashCommandSubcommandBuilder,
+  ChannelType,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
-  TextChannel,
-  type Channel,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import { getSetting } from "../../utils/database/settings";
+import { logChannel } from "../../utils/logChannel";
 
 export default class Purge {
   data: SlashCommandSubcommandBuilder;
@@ -20,7 +18,7 @@ export default class Purge {
       .addNumberOption(number =>
         number
           .setName("amount")
-          .setDescription("The amount of messages that you want to purge.")
+          .setDescription("The amount of messages that you want to purge (maximum is 100).")
           .setRequired(true)
       )
       .addChannelOption(channel =>
@@ -71,24 +69,15 @@ export default class Purge {
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice
     )
-      channel == interaction.channel
-        ? await channel.bulkDelete(amount + 1, true)
-        : await channel.bulkDelete(amount, true);
+      try {
+        channel == interaction.channel
+          ? await channel.bulkDelete(amount + 1, true)
+          : await channel.bulkDelete(amount, true);
+      } catch (error) {
+        console.error(error);
+      }
 
-    const logChannel = getSetting(guild.id, "moderation", "channel");
-    if (logChannel) {
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          if (channel.type != ChannelType.GuildText) return null;
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (channel) await channel.send({ embeds: [embed] });
-    }
-
+    await logChannel(guild, embed);
     await interaction.reply({ embeds: [embed] });
   }
 }
