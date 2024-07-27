@@ -1,12 +1,12 @@
 import {
-  SlashCommandSubcommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { listUserModeration } from "../../utils/database/moderation";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class Warns {
   data: SlashCommandSubcommandBuilder;

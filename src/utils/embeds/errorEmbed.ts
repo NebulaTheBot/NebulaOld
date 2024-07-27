@@ -1,4 +1,4 @@
-import { EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
+import { EmbedBuilder, type ChatInputCommandInteraction, type ButtonInteraction } from "discord.js";
 import { genColor } from "../colorGen";
 
 /**
@@ -8,8 +8,8 @@ import { genColor } from "../colorGen";
  * @param reason The reason of the error.
  * @returns Embed with the error description.
  */
-export function errorEmbed(
-  interaction: ChatInputCommandInteraction,
+export async function errorEmbed(
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
   title: string,
   reason?: string
 ) {
@@ -20,5 +20,5 @@ export function errorEmbed(
     .setDescription(content.join("\n"))
     .setColor(genColor(0));
 
-  return interaction.reply({ embeds: [embed], ephemeral: true });
+  return await interaction.reply({ embeds: [embed], ephemeral: true });
 }

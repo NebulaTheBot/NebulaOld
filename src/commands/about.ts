@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { randomise } from "../utils/randomise";
 

@@ -10,6 +10,7 @@ import {
 import { genColor } from "../utils/colorGen";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { getSetting } from "../utils/database/settings";
+import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { imageColor } from "../utils/imageColor";
 
 export default class User {
@@ -57,7 +58,7 @@ export default class User {
       })
       .setFields(
         {
-          name: `<:realdiscord:1221878641462345788> • Discord info`,
+          name: `<:discord:1266797021126459423> • Discord info`,
           value: [
             `Username is **${selectedUser.username}**`,
             `Display name is ${
@@ -80,7 +81,6 @@ export default class User {
       );
 
     const components = [];
-
     if (getSetting(`${guild.id}`, "levelling", "enabled") && !selectedUser.bot) {
       const row = new ActionRowBuilder<ButtonBuilder>();
       row.addComponents(
@@ -95,6 +95,7 @@ export default class User {
           .setEmoji("⚡")
           .setStyle(ButtonStyle.Primary)
       );
+      row.components[0].setDisabled(true);
 
       const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
       const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
@@ -109,11 +110,17 @@ export default class User {
       );
 
       interaction.channel
-        ?.createMessageComponentCollector({
-          filter: i => i.user.id === interaction.user.id,
-          time: 60000
-        })
+        ?.createMessageComponentCollector({ time: 60000 })
         .on("collect", async (i: ButtonInteraction) => {
+          if (i.member?.user.id !== interaction.member?.user.id)
+            return await errorEmbed(i, "You aren't the person who executed this command");
+
+          setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
+
+          i.customId === "general"
+            ? row.components[0].setDisabled(true)
+            : row.components[1].setDisabled(true);
+
           const levelEmbed = new EmbedBuilder()
             .setAuthor({
               name: `•  ${target.nickname ?? selectedUser.displayName}`,
@@ -145,14 +152,16 @@ export default class User {
 
           switch (i.customId) {
             case "general":
-              await interaction.editReply({ embeds: [embed], components: [row] });
+              row.components[1].setDisabled(false);
+              await interaction.editReply({ embeds: [levelEmbed], components: [row] });
               break;
             case "level":
+              row.components[0].setDisabled(false);
               await interaction.editReply({ embeds: [levelEmbed], components: [row] });
               break;
           }
 
-          i.update({});
+          await i.update({});
         });
 
       components.push(row);

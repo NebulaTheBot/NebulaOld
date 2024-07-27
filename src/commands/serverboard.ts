@@ -1,15 +1,15 @@
 import {
-  SlashCommandBuilder,
-  ButtonBuilder,
   ActionRowBuilder,
-  ButtonStyle,
+  ButtonBuilder,
   ButtonInteraction,
+  ButtonStyle,
   ComponentType,
+  SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { serverEmbed } from "../utils/embeds/serverEmbed";
 import { listPublicServers } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
+import { serverEmbed } from "../utils/embeds/serverEmbed";
 
 export default class Serverboard {
   data: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
