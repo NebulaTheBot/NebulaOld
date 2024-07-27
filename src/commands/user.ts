@@ -153,7 +153,7 @@ export default class User {
           switch (i.customId) {
             case "general":
               row.components[1].setDisabled(false);
-              await interaction.editReply({ embeds: [levelEmbed], components: [row] });
+              await interaction.editReply({ embeds: [embed], components: [row] });
               break;
             case "level":
               row.components[0].setDisabled(false);
