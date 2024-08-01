@@ -10,48 +10,77 @@ const tableDefinition = {
   }
 } satisfies TableDefinition;
 
-export const settingsDefinition: Record<string, Record<string, [FieldData, string]>> = {
+export const settingsDefinition: Record<
+  string,
+  Record<string, { type: FieldData; desc: string; val?: any }>
+> = {
   levelling: {
-    enabled: ["BOOL", "Enable/disable the levelling system."],
-    channel: [
-      "TEXT",
-      "ID of the log channel for levelling-related stuff (i.e someone levelling up)."
-    ],
-    block_channels: [
-      "TEXT",
-      "ID(s) of the channels where messages aren't counted, comma separated."
-    ],
-    set_level: ["TEXT", "Set the level of a user."],
-    add_multiplier: [
-      "TEXT",
-      "Add an XP multiplier to the levelling system. Syntax: multiplier, role/channel (choose), id."
-    ],
-    set_xp_gain: ["INTEGER", "Set the amount of XP a user gains per message."],
-    set_cooldown: ["INTEGER", "Set the cooldown between messages that add XP."]
+    enabled: { type: "BOOL", desc: "Enable/disable the levelling system.", val: true },
+    channel: {
+      type: "TEXT",
+      desc: "ID of the log channel for levelling-related stuff (i.e someone levelling up)."
+    },
+    block_channels: {
+      type: "TEXT",
+      desc: "ID(s) of the channels where messages aren't counted, comma separated."
+    },
+    set_level: { type: "TEXT", desc: "Set the level of a user." },
+    add_multiplier: {
+      type: "TEXT",
+      desc: "Add an XP multiplier to the levelling system. Syntax: multiplier, role/channel (choose), id."
+    },
+    set_xp_gain: {
+      type: "INTEGER",
+      desc: "Set the amount of XP a user gains per message.",
+      val: 2
+    },
+    set_cooldown: {
+      type: "INTEGER",
+      desc: "Set the cooldown between messages that add XP.",
+      val: 2
+    }
   },
   moderation: {
-    channel: [
-      "TEXT",
-      "ID of the log channel for moderation-related stuff (i.e a message being edited)."
-    ],
-    log_messages: ["BOOL", "Whether or not edited/deleted messages should be logged."]
+    channel: {
+      type: "TEXT",
+      desc: "ID of the log channel for moderation-related stuff (i.e a message being edited)."
+    },
+    log_messages: {
+      type: "BOOL",
+      desc: "Whether or not edited/deleted messages should be logged.",
+      val: true
+    }
   },
   news: {
-    channel_id: ["TEXT", "ID of the channel where news messages are sent."],
-    role_id: ["TEXT", "ID of the roles that should be pinged when a news message is sent."],
-    edit_original_message: [
-      "BOOL",
-      "Whether or not the original message should be edited when a news message is updated."
-    ]
+    channel_id: { type: "TEXT", desc: "ID of the channel where news messages are sent." },
+    role_id: {
+      type: "TEXT",
+      desc: "ID of the roles that should be pinged when a news message is sent."
+    },
+    edit_original_message: {
+      type: "BOOL",
+      desc: "Whether or not the original message should be edited when a news message is updated.",
+      val: true
+    }
   },
   serverboard: {
-    invite_link: ["TEXT", "The invite link which is shown on the serverboard."],
-    shown: ["BOOL", "Whether or not the server should be shown on the serverboard."]
+    invite_link: {
+      type: "TEXT",
+      desc: "The invite link which is shown on the serverboard."
+    },
+    shown: {
+      type: "BOOL",
+      desc: "Whether or not the server should be shown on the serverboard.",
+      val: false
+    }
   },
   welcome: {
-    text: ["TEXT", "The welcome message that is sent when a user joins."],
-    goodbye_text: ["TEXT", "The goodbye message that is sent when a user leaves."],
-    channel: ["TEXT", "ID of the channel where welcome messages are sent."]
+    text: { type: "TEXT", desc: "The welcome message that is sent when a user joins." },
+    goodbye_text: {
+      type: "TEXT",
+      desc: "The goodbye message that is sent when a user leaves."
+    },
+    channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." }
   }
 };
 
@@ -75,7 +104,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     typeof tableDefinition
   >[];
   if (res.length == 0) return null;
-  switch (settingsDefinition[key][setting][0]) {
+  switch (settingsDefinition[key][setting].type) {
     case "TEXT":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
@@ -93,7 +122,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
   guildID: string,
   key: K,
   setting: string,
-  value: string //TypeOfKey<K>
+  value: string // TypeOfKey<K>
 ) {
   const doInsert = getSetting(guildID, key, setting) == null;
   if (!doInsert) {
@@ -109,6 +138,4 @@ export function listPublicServers() {
 }
 
 // Utility type
-type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<
-  (typeof settingsDefinition)[T][any][0]
->;
+type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<(typeof settingsDefinition)[T]>;

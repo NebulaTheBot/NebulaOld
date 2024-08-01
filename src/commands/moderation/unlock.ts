@@ -14,7 +14,7 @@ export default class Unlock {
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("unlock")
-      .setDescription("Unlocks a channel")
+      .setDescription("Unlocks a channel.")
       .addChannelOption(channel =>
         channel
           .setName("channel")

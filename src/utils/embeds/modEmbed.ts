@@ -48,10 +48,11 @@ export async function errorCheck(
     );
 
   if (!allErrors) return;
+  if (!target) return;
   if (target === member)
     return errorEmbed(interaction, `You can't ${action.toLowerCase()} yourself.`);
 
-  if (target.user.id === interaction.client.user.id)
+  if (target.id === interaction.client.user.id)
     return errorEmbed(interaction, `You can't ${action.toLowerCase()} Sokora.`);
 
   if (!target.manageable)
@@ -69,7 +70,7 @@ export async function errorCheck(
     );
 
   if (ownerError) {
-    if (member.id === guild.ownerId)
+    if (target.id === guild.ownerId)
       return errorEmbed(
         interaction,
         `You can't ${action.toLowerCase()} ${name}.`,
@@ -101,6 +102,7 @@ export async function modEmbed(options: Options, reason?: string | null, date?: 
 
   const dmChannel = await user.createDM().catch(() => null);
   if (!dmChannel) return;
+  if (!guild.members.cache.get(user.id)) return;
   if (user.bot) return;
   await dmChannel
     .send({

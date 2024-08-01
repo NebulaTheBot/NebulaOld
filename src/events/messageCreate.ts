@@ -41,7 +41,7 @@ export default {
         for (const channelID of kominator(blockedChannels))
           if (message.channelId === channelID) return;
 
-      let expGain = (getSetting(guild.id, "levelling", "set_xp_gain")! as number) ?? 2;
+      let expGain = getSetting(guild.id, "levelling", "set_xp_gain")! as number;
       const multiplier = getSetting(guild.id, "levelling", "add_multiplier")! as string;
       if (multiplier != null) {
         const expMultiplier = kominator(multiplier);

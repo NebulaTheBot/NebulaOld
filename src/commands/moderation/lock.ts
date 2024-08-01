@@ -14,7 +14,7 @@ export default class Lock {
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("lock")
-      .setDescription("Locks a channel")
+      .setDescription("Locks a channel.")
       .addChannelOption(channel =>
         channel
           .setName("channel")
