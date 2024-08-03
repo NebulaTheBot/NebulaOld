@@ -138,4 +138,6 @@ export function listPublicServers() {
 }
 
 // Utility type
-type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<(typeof settingsDefinition)[T]>;
+type TypeOfKey<T extends keyof typeof settingsDefinition> = SqlType<
+  (typeof settingsDefinition)[T][any]["type"]
+>;

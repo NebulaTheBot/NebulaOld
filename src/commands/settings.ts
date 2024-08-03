@@ -42,25 +42,37 @@ export default class Settings {
         .setName(key)
         .setDescription("This command has no description.");
       Object.keys(settingsDefinition[key]).forEach(sub => {
-        switch (settingsDefinition[key][sub][0] as string) {
+        switch (settingsDefinition[key][sub]["type"] as string) {
           case "BOOL":
             subcommand.addBooleanOption(option =>
-              option.setName(sub).setDescription(settingsDefinition[key][sub][1]).setRequired(false)
+              option
+                .setName(sub)
+                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setRequired(false)
             );
             break;
           case "INTEGER":
             subcommand.addIntegerOption(option =>
-              option.setName(sub).setDescription(settingsDefinition[key][sub][1]).setRequired(false)
+              option
+                .setName(sub)
+                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setRequired(false)
             );
             break;
           case "USER":
             subcommand.addUserOption(option =>
-              option.setName(sub).setDescription(settingsDefinition[key][sub][1]).setRequired(false)
+              option
+                .setName(sub)
+                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setRequired(false)
             );
             break;
           default: // Also includes "TEXT"
             subcommand.addStringOption(option =>
-              option.setName(sub).setDescription(settingsDefinition[key][sub][1]).setRequired(false)
+              option
+                .setName(sub)
+                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setRequired(false)
             );
             break;
         }
