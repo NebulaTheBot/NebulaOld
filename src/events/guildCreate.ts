@@ -1,7 +1,8 @@
-import { EmbedBuilder, type DMChannel, type Client, type Guild } from "discord.js";
-import { genColor } from "../utils/colorGen";
-import { randomise } from "../utils/randomise";
+import { EmbedBuilder, type Client, type DMChannel, type Guild } from "discord.js";
 import Commands from "../handlers/commands";
+import { genColor } from "../utils/colorGen";
+import { setSetting, settingsDefinition } from "../utils/database/settings";
+import { randomise } from "../utils/randomise";
 
 export default {
   name: "guildCreate",
@@ -12,9 +13,9 @@ export default {
     }
 
     async run(guild: Guild) {
-      const dmChannel = (await (await guild.fetchOwner())
-        .createDM()
-        .catch(() => null)) as DMChannel | undefined;
+      const dmChannel = (await (await guild.fetchOwner()).createDM().catch(() => null)) as
+        | DMChannel
+        | undefined;
 
       let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
       if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
@@ -32,6 +33,11 @@ export default {
         .setColor(genColor(200));
 
       await new Commands(guild.client).registerCommandsForGuild(guild);
+
+      for (const key in settingsDefinition)
+        for (const setting in settingsDefinition[key])
+          setSetting(guild.id, key, setting, settingsDefinition[key][setting].val);
+
       if (dmChannel) await dmChannel.send({ embeds: [embed] });
     }
   }

@@ -1,4 +1,4 @@
-export type FieldData = "TEXT" | "INTEGER" | "BOOL" | "TIMESTAMP";
+export type FieldData = "TEXT" | "INTEGER" | "BOOL" | "TIMESTAMP" | "LIST";
 
 export type TableDefinition = {
   name: string;

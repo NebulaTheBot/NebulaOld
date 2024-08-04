@@ -125,9 +125,7 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
   value: string // TypeOfKey<K>
 ) {
   const doInsert = getSetting(guildID, key, setting) == null;
-  if (!doInsert) {
-    deleteQuery.all(JSON.stringify(guildID), key + "." + setting);
-  }
+  if (!doInsert) deleteQuery.all(JSON.stringify(guildID), key + "." + setting);
   insertQuery.run(JSON.stringify(guildID), key + "." + setting, value);
 }
 
