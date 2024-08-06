@@ -3,6 +3,7 @@ import ms from "ms";
 import { genColor } from "../colorGen";
 import { logChannel } from "../logChannel";
 import { errorEmbed } from "./errorEmbed";
+import { getSetting } from "../database/settings";
 
 type Options = {
   interaction: ChatInputCommandInteraction;
@@ -99,6 +100,9 @@ export async function modEmbed(options: Options, reason?: string | null, date?: 
 
   await logChannel(guild, embed);
   await interaction.reply({ embeds: [embed] });
+
+  const dmOrNot = getSetting(guild.id, "moderation", "enabled");
+  if (!dmOrNot) return;
 
   const dmChannel = await user.createDM().catch(() => null);
   if (!dmChannel) return;

@@ -10,6 +10,7 @@ export type SqlType<T extends FieldData> = {
   INTEGER: number;
   TEXT: string;
   TIMESTAMP: Date;
+  LIST: any[];
 }[T];
 
 export type TypeOfDefinition<T extends TableDefinition> = {

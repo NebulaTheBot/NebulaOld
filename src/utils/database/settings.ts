@@ -26,8 +26,13 @@ export const settingsDefinition: Record<
     },
     set_level: { type: "TEXT", desc: "Set the level of a user." },
     add_multiplier: {
-      type: "TEXT",
-      desc: "Add an XP multiplier to the levelling system. Syntax: multiplier, role/channel (choose), id."
+      type: "LIST",
+      desc: "Add an XP multiplier to the levelling system.",
+      val: {
+        multiplier: { type: "INTEGER", desc: "Set the XP multiplier for the role/channel." },
+        role_channel: { type: "TEXT", desc: "Role or channel. (choose)" },
+        id: { type: "TEXT", desc: "ID of the role/channel." }
+      }
     },
     set_xp_gain: {
       type: "INTEGER",
@@ -49,6 +54,11 @@ export const settingsDefinition: Record<
       type: "BOOL",
       desc: "Whether or not edited/deleted messages should be logged.",
       val: true
+    },
+    dm_user: {
+      type: "BOOL",
+      desc: "Whether or not should the bot send a DM after a moderation action.",
+      val: true
     }
   },
   news: {
@@ -64,10 +74,6 @@ export const settingsDefinition: Record<
     }
   },
   serverboard: {
-    invite_link: {
-      type: "TEXT",
-      desc: "The invite link which is shown on the serverboard."
-    },
     shown: {
       type: "BOOL",
       desc: "Whether or not the server should be shown on the serverboard.",
@@ -103,6 +109,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
   let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<
     typeof tableDefinition
   >[];
+  console.log(res);
   if (res.length == 0) return null;
   switch (settingsDefinition[key][setting].type) {
     case "TEXT":
@@ -113,6 +120,8 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
       ) as TypeOfKey<K>;
     case "INTEGER":
       return parseInt(res[0].value) as TypeOfKey<K>;
+    case "LIST":
+      return res[0].value as TypeOfKey<K>;
     default:
       return "WIP" as TypeOfKey<K>;
   }
@@ -126,7 +135,12 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
 ) {
   const doInsert = getSetting(guildID, key, setting) == null;
   if (!doInsert) deleteQuery.all(JSON.stringify(guildID), key + "." + setting);
-  insertQuery.run(JSON.stringify(guildID), key + "." + setting, value);
+  if (settingsDefinition[key][setting].type == "LIST") {
+    const values = Object.values(settingsDefinition[key][setting].val) as string[];
+    value = values.toString();
+  }
+
+  insertQuery.run(JSON.stringify(guildID), `${key}.${setting}`, value);
 }
 
 export function listPublicServers() {

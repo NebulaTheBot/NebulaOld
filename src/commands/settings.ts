@@ -1,19 +1,19 @@
 import {
-  InteractionType,
-  EmbedBuilder,
-  SlashCommandBuilder,
-  PermissionsBitField,
-  type ChatInputCommandInteraction,
   AutocompleteInteraction,
-  SlashCommandSubcommandBuilder
+  EmbedBuilder,
+  InteractionType,
+  PermissionsBitField,
+  SlashCommandBuilder,
+  SlashCommandSubcommandBuilder,
+  type ChatInputCommandInteraction
 } from "discord.js";
+import { genColor } from "../utils/colorGen";
 import {
   getSetting,
   setSetting,
   settingsDefinition,
   settingsKeys
 } from "../utils/database/settings";
-import { genColor } from "../utils/colorGen";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 
 export default class Settings {
@@ -23,19 +23,6 @@ export default class Settings {
       .setName("settings")
       .setDescription("Configure Sokora to your liking.")
       .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
-    // .addStringOption(string =>
-    //   string
-    //     .setName("key")
-    //     .setDescription("The setting key to set")
-    //     .addChoices(...settingsKeys.map(key => ({ name: key, value: key })))
-    //     .setRequired(true)
-    // )
-    // .addStringOption(string =>
-    //   string
-    //     .setName("value")
-    //     .setDescription("The value you want to set this option to, or blank for view")
-    //     .setAutocomplete(true)
-    // );
 
     settingsKeys.forEach(key => {
       const subcommand = new SlashCommandSubcommandBuilder()
@@ -107,7 +94,7 @@ export default class Settings {
           value: getSetting(interaction.guildId!, key, name)?.toString() || "Not set"
         });
       });
-      return interaction.reply({ embeds: [embed] });
+      return await interaction.reply({ embeds: [embed] });
     }
 
     const embed = new EmbedBuilder().setTitle(`Parameters changed`).setColor(genColor(100));
@@ -119,7 +106,7 @@ export default class Settings {
       });
     });
 
-    interaction.reply({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 
   async autocomplete(interaction: AutocompleteInteraction) {
@@ -127,7 +114,7 @@ export default class Settings {
     //if (interaction.options.getSubcommand() != this.data.name) return;
     switch (Object.keys(settingsDefinition[interaction.options.getSubcommand()])[0]) {
       case "BOOL":
-        interaction.respond(
+        await interaction.respond(
           ["true", "false"].map(choice => ({
             name: choice,
             value: choice
@@ -135,7 +122,7 @@ export default class Settings {
         );
         break;
       default:
-        interaction.respond([]);
+        await interaction.respond([]);
     }
   }
 }

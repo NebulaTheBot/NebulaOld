@@ -19,7 +19,6 @@ type Options = {
 export async function serverEmbed(options: Options) {
   const { page, pages, guild } = options;
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;
-  const invite = getSetting(guild.id, "serverboard", "invite_link");
   const members = guild.members.cache;
   const boosters = members.filter(member => member.premiumSince);
   const onlineMembers = members.filter(member =>
@@ -45,7 +44,6 @@ export async function serverEmbed(options: Options) {
     `Owned by **${(await guild.fetchOwner()).user.displayName}**`,
     `Created on **<t:${Math.round(guild.createdAt.valueOf() / 1000)}:D>**`
   ];
-  if (options.showInvite && invite !== null) generalValues.push(`**Invite link**: ${invite}`);
 
   const embed = new EmbedBuilder()
     .setAuthor({
@@ -56,9 +54,8 @@ export async function serverEmbed(options: Options) {
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })
     .setThumbnail(guild.iconURL())
-    .setColor(genColor(200));
+    .setColor((await imageColor(guild)) ?? genColor(200));
 
-  imageColor(embed, guild);
   if (options.roles)
     embed.addFields({
       name: `🎭 • ${roles.size - 1} ${roles.size === 1 ? "role" : "roles"}`,
