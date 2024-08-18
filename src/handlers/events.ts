@@ -1,15 +1,15 @@
 import type { Client } from "discord.js";
-import { pathToFileURL } from "url";
-import { join } from "path";
 import { readdirSync } from "fs";
+import { join } from "path";
+import { pathToFileURL } from "url";
 
-export default class Events {
+export class Events {
   client: Client;
   events: any[] = [];
   constructor(client: Client) {
     this.client = client;
 
-    (async () => {
+    async () => {
       const eventsPath = join(process.cwd(), "src", "events");
 
       for (const eventFile of readdirSync(eventsPath)) {
@@ -20,6 +20,6 @@ export default class Events {
 
         this.events.push({ name: event.default.name, event: clientEvent });
       }
-    })();
+    };
   }
 }

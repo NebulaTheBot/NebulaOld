@@ -1,17 +1,17 @@
 import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ModalBuilder,
-  TextInputBuilder,
   ActionRowBuilder,
+  EmbedBuilder,
+  ModalBuilder,
+  PermissionsBitField,
+  SlashCommandSubcommandBuilder,
+  TextInputBuilder,
   TextInputStyle,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
+import { sendNews } from "../../utils/database/news";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../utils/sendChannelNews";
-import { sendNews } from "../../utils/database/news";
 
 export default class Send {
   data: SlashCommandSubcommandBuilder;
@@ -68,7 +68,7 @@ export default class Send {
 
       await sendChannelNews(guild, id, interaction).catch(err => console.error(err));
       await i.reply({
-        embeds: [new EmbedBuilder().setTitle("✅  •  News sent!").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("News sent!").setColor(genColor(100))]
       });
     });
   }

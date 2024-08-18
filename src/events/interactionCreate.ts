@@ -1,7 +1,7 @@
-import type { CommandInteraction, Client, AutocompleteInteraction } from "discord.js";
-import { pathToFileURL } from "url";
-import { join } from "path";
 import { file } from "bun";
+import type { AutocompleteInteraction, Client, CommandInteraction } from "discord.js";
+import { join } from "path";
+import { pathToFileURL } from "url";
 
 async function getCommand(
   interaction: CommandInteraction | AutocompleteInteraction,
@@ -10,7 +10,7 @@ async function getCommand(
   const commandName = interaction.commandName;
   const subcommandName = options.getSubcommand(false);
   const commandGroupName = options.getSubcommandGroup(false);
-  var commandImportPath = join(
+  let commandImportPath = join(
     join(process.cwd(), "src", "commands"),
     `${
       subcommandName
@@ -20,7 +20,9 @@ async function getCommand(
         : commandName
     }.ts`
   );
-  if (!await file(commandImportPath).exists()) commandImportPath = join(join(process.cwd(), "src", "commands", `${commandName}.ts`));
+
+  if (!(await file(commandImportPath).exists()))
+    commandImportPath = join(join(process.cwd(), "src", "commands", `${commandName}.ts`));
 
   return new (await import(pathToFileURL(commandImportPath).toString())).default();
 }

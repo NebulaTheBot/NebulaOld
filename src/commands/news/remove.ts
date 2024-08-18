@@ -1,14 +1,14 @@
 import {
-  SlashCommandSubcommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
+  SlashCommandSubcommandBuilder,
   TextChannel,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { deleteNews, get } from "../../utils/database/news";
 import { getSetting } from "../../utils/database/settings";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class Remove {
   data: SlashCommandSubcommandBuilder;
@@ -41,13 +41,13 @@ export default class Remove {
 
     const messageID = news.messageID;
     const newsChannel = (await guild.channels
-      .fetch(getSetting(guild.id, "news", "channel_id")! ?? interaction.channel?.id)
+      .fetch((getSetting(guild.id, "news", "channel_id") as string) ?? interaction.channel?.id)
       .catch(() => null)) as TextChannel;
 
     if (newsChannel) await newsChannel.messages.delete(messageID);
     deleteNews(id);
     await interaction.reply({
-      embeds: [new EmbedBuilder().setTitle("✅  •  News deleted!").setColor(genColor(100))]
+      embeds: [new EmbedBuilder().setTitle("News deleted!").setColor(genColor(100))]
     });
   }
 }

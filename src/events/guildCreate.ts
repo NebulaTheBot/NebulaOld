@@ -1,5 +1,5 @@
 import { EmbedBuilder, Guild, type Client, type DMChannel } from "discord.js";
-import Commands from "../handlers/commands";
+import { Commands } from "../handlers/commands";
 import { genColor } from "../utils/colorGen";
 import { getSetting, setSetting, settingsDefinition } from "../utils/database/settings";
 import { randomise } from "../utils/randomise";

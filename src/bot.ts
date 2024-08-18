@@ -1,6 +1,6 @@
 import { ActivityType, Client } from "discord.js";
-import Commands from "./handlers/commands";
-import Events from "./handlers/events";
+import { Commands } from "./handlers/commands";
+import { Events } from "./handlers/events";
 
 const client = new Client({
   presence: {

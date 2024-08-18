@@ -1,15 +1,15 @@
 import {
+  Guild,
   SlashCommandBuilder,
   SlashCommandSubcommandGroupBuilder,
-  Guild,
   type Client
 } from "discord.js";
-import { pathToFileURL } from "url";
-import { join } from "path";
 import { readdirSync } from "fs";
+import { join } from "path";
+import { pathToFileURL } from "url";
 import { getDisabledCommands } from "../utils/database/disabledCommands";
 
-export default class Commands {
+export class Commands {
   client: Client;
   commands: any[] = [];
   constructor(client: Client) {

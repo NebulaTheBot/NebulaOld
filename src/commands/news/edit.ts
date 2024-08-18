@@ -1,19 +1,19 @@
 import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ModalBuilder,
-  TextInputBuilder,
   ActionRowBuilder,
+  EmbedBuilder,
+  ModalBuilder,
+  PermissionsBitField,
+  SlashCommandSubcommandBuilder,
+  TextInputBuilder,
   TextInputStyle,
   type ChatInputCommandInteraction,
-  type TextChannel,
-  type Role
+  type Role,
+  type TextChannel
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { get, updateNews } from "../../utils/database/news";
 import { getSetting } from "../../utils/database/settings";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../utils/sendChannelNews";
 
 export default class Edit {
@@ -81,7 +81,7 @@ export default class Edit {
     interaction.client.once("interactionCreate", async i => {
       if (!i.isModalSubmit()) return;
 
-      const role = getSetting(guild.id, "news", "role_id");
+      const role = getSetting(guild.id, "news", "role_id") as string;
       let roleToSend: Role | undefined;
       if (role) roleToSend = guild.roles.cache.get(role);
       const title = i.fields.getTextInputValue("title");
@@ -99,7 +99,7 @@ export default class Edit {
 
       (
         guild.channels.cache.get(
-          getSetting(guild.id, "news", "channel_id")! ?? interaction.channel?.id
+          (getSetting(guild.id, "news", "channel_id") as string) ?? interaction.channel?.id
         ) as TextChannel
       )?.messages.edit(news.messageID, {
         embeds: [embed],
@@ -108,7 +108,7 @@ export default class Edit {
 
       updateNews(id, title, body);
       await interaction.reply({
-        embeds: [new EmbedBuilder().setTitle("✅  •  News edited!").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("News edited!").setColor(genColor(100))]
       });
     });
   }

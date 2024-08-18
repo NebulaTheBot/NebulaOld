@@ -1,4 +1,5 @@
 import { getDatabase } from ".";
+import { kominator } from "../kominator";
 import { FieldData, SqlType, TableDefinition, TypeOfDefinition } from "./types";
 
 const tableDefinition = {
@@ -81,10 +82,13 @@ export const settingsDefinition: Record<
     }
   },
   welcome: {
-    text: { type: "TEXT", desc: "The welcome message that is sent when a user joins." },
+    text: {
+      type: "TEXT",
+      desc: "The welcome message that is sent when a user joins. You can type (user) to display the username, (count) to display the server count and (servername) to display the server name."
+    },
     goodbye_text: {
       type: "TEXT",
-      desc: "The goodbye message that is sent when a user leaves."
+      desc: "The goodbye message that is sent when a user leaves. You can type (user) to display the username, (count) to display the server count and (servername) to display the server name."
     },
     channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." }
   }
@@ -121,7 +125,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     case "INTEGER":
       return parseInt(res[0].value) as TypeOfKey<K>;
     case "LIST":
-      return res[0].value as TypeOfKey<K>;
+      return kominator(res[0].value) as TypeOfKey<K>;
     default:
       return "WIP" as TypeOfKey<K>;
   }
@@ -135,11 +139,6 @@ export function setSetting<K extends keyof typeof settingsDefinition>(
 ) {
   const doInsert = getSetting(guildID, key, setting) == null;
   if (!doInsert) deleteQuery.all(JSON.stringify(guildID), key + "." + setting);
-  if (settingsDefinition[key][setting].type == "LIST") {
-    const values = Object.values(settingsDefinition[key][setting].val) as string[];
-    value = values.toString();
-  }
-
   insertQuery.run(JSON.stringify(guildID), `${key}.${setting}`, value);
 }
 

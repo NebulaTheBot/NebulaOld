@@ -1,14 +1,14 @@
 import {
-  SlashCommandSubcommandBuilder,
-  EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
+  SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { listAllNews } from "../../utils/database/news";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
 export default class View {
   data: SlashCommandSubcommandBuilder;
@@ -49,11 +49,11 @@ export default class View {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("left")
-        .setEmoji("1137330341472915526")
+        .setEmoji("1271045078042935398")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId("right")
-        .setEmoji("1137330125004869702")
+        .setEmoji("1271045041313415370")
         .setStyle(ButtonStyle.Primary)
     );
 

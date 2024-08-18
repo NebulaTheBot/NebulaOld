@@ -13,10 +13,10 @@ export default {
 
     async run(member: GuildMember) {
       const guildID = member.guild.id;
-      const id = getSetting(guildID, "welcome", "channel");
+      const id = getSetting(guildID, "welcome", "channel") as string;
       if (!id) return;
 
-      let text = getSetting(guildID, "welcome", "goodbye_text");
+      let text = getSetting(guildID, "welcome", "goodbye_text") as string;
       const user = member.user;
       const guild = member.guild;
       const channel = (await member.guild.channels.cache
@@ -34,9 +34,10 @@ export default {
         .setDescription(text ?? `**@${user.displayName}** has left the server 😥`)
         .setFooter({ text: `User ID: ${member.id}` })
         .setThumbnail(avatarURL)
-        .setColor(genColor(200));
+        .setColor(
+          member.user.hexAccentColor ?? (await imageColor(undefined, member)) ?? genColor(200)
+        );
 
-      imageColor(embed, undefined, member);
       await channel.send({ embeds: [embed] });
     }
   }

@@ -5,6 +5,7 @@ import {
   PermissionsBitField,
   SlashCommandBuilder,
   SlashCommandSubcommandBuilder,
+  SlashCommandSubcommandGroupBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
@@ -27,7 +28,8 @@ export default class Settings {
     settingsKeys.forEach(key => {
       const subcommand = new SlashCommandSubcommandBuilder()
         .setName(key)
-        .setDescription("This command has no description.");
+        .setDescription("This subcommand has no description.");
+
       Object.keys(settingsDefinition[key]).forEach(sub => {
         switch (settingsDefinition[key][sub]["type"] as string) {
           case "BOOL":
@@ -54,6 +56,10 @@ export default class Settings {
                 .setRequired(false)
             );
             break;
+          // case "LIST":
+          //   const subcommandGroup = new SlashCommandSubcommandGroupBuilder()
+          //     .setName(key)
+          //     .setDescription("This subcommand group has no description.");
           default: // Also includes "TEXT"
             subcommand.addStringOption(option =>
               option
@@ -64,7 +70,6 @@ export default class Settings {
             break;
         }
       });
-      //console.log(subcommand);
       this.data.addSubcommand(subcommand);
     });
   }
@@ -85,15 +90,16 @@ export default class Settings {
     const values = interaction.options.data[0].options!;
     console.log(values);
     if (values.length == 0) {
-      const embed = new EmbedBuilder();
-      embed.setTitle(`Settings for ${key}`);
-      embed.setColor(genColor(100));
+      const embed = new EmbedBuilder().setTitle(`Settings for ${key}`).setColor(genColor(100));
+      const description: string[] = [];
+
       Object.keys(settingsDefinition[key]).forEach(name => {
-        embed.addFields({
-          name: name,
-          value: getSetting(interaction.guildId!, key, name)?.toString() || "Not set"
-        });
+        description.push(
+          `${name}: ${getSetting(interaction.guildId!, key, name)?.toString() || "Not set"}`
+        );
+        embed.setDescription(description.join("\n"));
       });
+
       return await interaction.reply({ embeds: [embed] });
     }
 
