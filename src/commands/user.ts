@@ -24,10 +24,11 @@ export default class User {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const user = interaction.options.getUser("user");
-    const id = user ? user.id : interaction.member?.user.id;
     const target = guild.members.cache
-      .filter(member => member.user.id === id)
+      .filter(
+        member =>
+          member.user.id === (interaction.options.getUser("user")?.id ?? interaction.user.id)
+      )
       .map(user => user)[0]!;
 
     const selectedUser = await target.user.fetch();
@@ -50,6 +51,9 @@ export default class User {
           .map(role => `<@&${role[1].id}>`)
           .join(", ")}${memberRoles.length > 3 ? ` **and ${memberRoles.length - 4} more**` : ""}`
       );
+
+    const embedColor =
+      selectedUser.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200);
 
     let embed = new EmbedBuilder()
       .setAuthor({
@@ -76,14 +80,11 @@ export default class User {
       )
       .setFooter({ text: `User ID: ${target.id}` })
       .setThumbnail(target.displayAvatarURL()!)
-      .setColor(
-        selectedUser.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200)
-      );
+      .setColor(embedColor);
 
     const components = [];
     if (getSetting(`${guild.id}`, "levelling", "enabled") && !selectedUser.bot) {
-      const row = new ActionRowBuilder<ButtonBuilder>();
-      row.addComponents(
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("general")
           .setLabel("•  General")
@@ -112,8 +113,8 @@ export default class User {
       interaction.channel
         ?.createMessageComponentCollector({ time: 60000 })
         .on("collect", async (i: ButtonInteraction) => {
-          if (i.member?.user.id !== interaction.member?.user.id)
-            return await errorEmbed(i, "You aren't the person who executed this command");
+          if (i.user.id !== interaction.user.id)
+            return await errorEmbed(i, "You aren't the person who executed this command.");
 
           setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
 
@@ -146,9 +147,7 @@ export default class User {
             )
             .setFooter({ text: `User ID: ${target.id}` })
             .setThumbnail(target.displayAvatarURL())
-            .setColor(
-              selectedUser.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200)
-            );
+            .setColor(embedColor);
 
           switch (i.customId) {
             case "general":

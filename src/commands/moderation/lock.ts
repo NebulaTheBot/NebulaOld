@@ -30,12 +30,14 @@ export default class Lock {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const member = guild.members.cache.get(interaction.member?.user.id!)!;
-
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageRoles))
-      return errorEmbed(
+    if (
+      !guild.members.cache
+        .get(interaction.user.id)
+        ?.permissions.has(PermissionsBitField.Flags.ManageRoles)
+    )
+      return await errorEmbed(
         interaction,
-        "You can't execute this command",
+        "You can't execute this command.",
         "You need the **Manage Roles** permission."
       );
 
@@ -43,14 +45,14 @@ export default class Lock {
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
 
     if (!channel.permissionsFor(guild.id)?.has("SendMessages"))
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
-        "You can't execute this command",
+        "You can't execute this command.",
         "The channel is already locked."
       );
 
     const embed = new EmbedBuilder()
-      .setTitle(`Locked a channel`)
+      .setTitle(`Locked a channel.`)
       .setDescription(
         [
           `**Moderator**: ${interaction.user.username}`,
@@ -66,13 +68,10 @@ export default class Lock {
       ChannelType.GuildVoice
     )
       channel.permissionOverwrites
-        .create(interaction.guild!.id, {
+        .create(guild.id, {
           SendMessages: false,
           SendMessagesInThreads: false,
-          CreatePublicThreads: false,
-          CreatePrivateThreads: false,
-          UseApplicationCommands: false,
-          UseEmbeddedActivities: false
+          CreatePublicThreads: false
         })
         .catch(error => console.error(error));
 

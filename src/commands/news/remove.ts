@@ -30,14 +30,14 @@ export default class Remove {
     const member = guild.members.cache.get(interaction.user.id)!;
 
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "You can't execute this command.",
         "You need the **Manage Server** permission."
       );
 
     const news = get(id);
-    if (!news) return errorEmbed(interaction, "The specified news don't exist.");
+    if (!news) return await errorEmbed(interaction, "The specified news don't exist.");
 
     const messageID = news.messageID;
     const newsChannel = (await guild.channels
@@ -47,7 +47,7 @@ export default class Remove {
     if (newsChannel) await newsChannel.messages.delete(messageID);
     deleteNews(id);
     await interaction.reply({
-      embeds: [new EmbedBuilder().setTitle("News deleted!").setColor(genColor(100))]
+      embeds: [new EmbedBuilder().setTitle("News removed.").setColor(genColor(100))]
     });
   }
 }

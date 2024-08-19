@@ -8,18 +8,21 @@ export class Events {
   events: any[] = [];
   constructor(client: Client) {
     this.client = client;
+  }
 
-    async () => {
-      const eventsPath = join(process.cwd(), "src", "events");
+  async loadEvents() {
+    const eventsPath = join(process.cwd(), "src", "events");
 
-      for (const eventFile of readdirSync(eventsPath)) {
-        if (!eventFile.endsWith("ts")) continue;
+    for (const eventFile of readdirSync(eventsPath)) {
+      if (!eventFile.endsWith("ts")) continue;
 
-        const event = await import(pathToFileURL(join(eventsPath, eventFile)).toString());
-        const clientEvent = client.on(event.default.name, new event.default.event(client).run);
+      const event = await import(pathToFileURL(join(eventsPath, eventFile)).toString());
+      const clientEvent = this.client.on(
+        event.default.name,
+        new event.default.event(this.client).run
+      );
 
-        this.events.push({ name: event.default.name, event: clientEvent });
-      }
-    };
+      this.events.push({ name: event.default.name, event: clientEvent });
+    }
   }
 }

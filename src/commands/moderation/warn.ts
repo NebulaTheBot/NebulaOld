@@ -37,7 +37,7 @@ export default class Warn {
         guild.id,
         user.id,
         "WARN",
-        guild.members.cache.get(interaction.member?.user.id!)?.id!,
+        guild.members.cache.get(interaction.user.id)?.id!,
         reason ?? undefined
       );
     } catch (error) {

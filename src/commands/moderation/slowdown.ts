@@ -43,12 +43,14 @@ export default class Slowdown {
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
     const time = interaction.options.getString("time")!;
-    const member = guild.members.cache.get(interaction.member?.user.id!)!;
-
-    if (!member.permissions.has(PermissionsBitField.Flags.ManageChannels))
-      return errorEmbed(
+    if (
+      !guild.members.cache
+        .get(interaction.user.id)
+        ?.permissions.has(PermissionsBitField.Flags.ManageChannels)
+    )
+      return await errorEmbed(
         interaction,
-        "You can't execute this command",
+        "You can't execute this command.",
         "You need the **Manage Channels** permission."
       );
 

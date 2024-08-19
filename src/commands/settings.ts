@@ -75,12 +75,13 @@ export default class Settings {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
+    const guild = interaction.guild!;
     if (
-      !interaction.guild?.members.cache
-        ?.get(interaction.member?.user.id!)
+      !guild.members.cache
+        ?.get(interaction.user.id)
         ?.permissions.has(PermissionsBitField.Flags.Administrator)
     )
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "You can't execute this command.",
         "You need the **Administrator** permission."
@@ -94,9 +95,7 @@ export default class Settings {
       const description: string[] = [];
 
       Object.keys(settingsDefinition[key]).forEach(name => {
-        description.push(
-          `${name}: ${getSetting(interaction.guildId!, key, name)?.toString() || "Not set"}`
-        );
+        description.push(`${name}: ${getSetting(guild.id, key, name)?.toString() || "Not set"}`);
         embed.setDescription(description.join("\n"));
       });
 
@@ -105,7 +104,7 @@ export default class Settings {
 
     const embed = new EmbedBuilder().setTitle(`Parameters changed`).setColor(genColor(100));
     values.forEach(option => {
-      setSetting(interaction.guildId!, key, option.name, option.value as string);
+      setSetting(guild.id, key, option.name, option.value as string);
       embed.addFields({
         name: option.name,
         value: option.value?.toString() || "Not set"

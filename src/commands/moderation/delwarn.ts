@@ -44,7 +44,7 @@ export default class Delwarn {
     );
 
     if (newWarns.length === warns.length)
-      return errorEmbed(interaction, `There is no warn with the id of ${id}.`);
+      return await errorEmbed(interaction, `There is no warn with the id of ${id}.`);
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })

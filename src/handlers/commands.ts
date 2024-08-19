@@ -43,9 +43,7 @@ export class Commands {
         const subCommand = new subCommandModule.default();
 
         command.addSubcommand(subCommand.data);
-        if ("autocompleteHandler" in subCommand) {
-          subCommand.autocompleteHandler(this.client);
-        }
+        if ("autocompleteHandler" in subCommand) subCommand.autocompleteHandler(this.client);
         continue;
       }
 

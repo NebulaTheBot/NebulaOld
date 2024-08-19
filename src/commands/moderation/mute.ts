@@ -40,7 +40,7 @@ export default class Mute {
     );
 
     if (!ms(duration) || ms(duration) > ms("28d"))
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         `You can't mute ${user.displayName}.`,
         "The duration is invalid or is above the 28 day limit."

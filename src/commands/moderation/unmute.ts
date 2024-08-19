@@ -29,7 +29,11 @@ export default class Unmute {
     );
 
     if (target.communicationDisabledUntil === null)
-      return errorEmbed(interaction, "You can't unmute this user.", "The user was never muted.");
+      return await errorEmbed(
+        interaction,
+        "You can't unmute this user.",
+        "The user was never muted."
+      );
 
     await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
     await modEmbed({ interaction, user, action: "Unmuted" }, undefined, true);

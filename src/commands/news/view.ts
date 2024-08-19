@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   EmbedBuilder,
   SlashCommandSubcommandBuilder,
@@ -28,7 +29,7 @@ export default class View {
     let currentNews = sortedNews[page - 1];
 
     if (!news || !sortedNews || sortedNews.length == 0)
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "No news found.",
         "Admins can add news with the **/news send** command."
@@ -59,21 +60,12 @@ export default class View {
 
     await interaction.reply({ embeds: [embed], components: [row] });
     interaction.channel
-      ?.createMessageComponentCollector({
-        filter: i => i.user.id === interaction.user.id,
-        time: 60000
-      })
-      .on("collect", async i => {
-        if (!i.isButton()) return;
-        if (i.user.id !== interaction.user.id) {
-          errorEmbed(
-            interaction,
-            "No.",
-            "You have not sent this command. Type **/news view** to view news yourself."
-          );
-          return;
-        }
+      ?.createMessageComponentCollector({ time: 60000 })
+      .on("collect", async (i: ButtonInteraction) => {
+        if (i.user.id !== interaction.user.id)
+          return await errorEmbed(i, "You aren't the person who executed this command.");
 
+        setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
         if (i.customId === "left") {
           page--;
           if (page < 1) page = sortedNews.length;

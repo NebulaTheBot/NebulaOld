@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  ComponentType,
   SlashCommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
@@ -29,10 +28,10 @@ export default class Serverboard {
 
     const pages = guildList.length;
     if (pages == 0)
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
-        "No public server found",
-        "By some magical miracle, all the servers using Sokora turned off their visibility. Use /settings key:`serverboard.shown` value:`TRUE` to make your server publicly visible."
+        "No public server found.",
+        "By some magical miracle, all the servers using Sokora turned off their visibility. Use /settings serverboard `shown: True` to make your server publicly visible."
       );
 
     const argPage = interaction.options.get("page")?.value as number;
@@ -55,8 +54,12 @@ export default class Serverboard {
 
     const reply = await interaction.reply({ embeds: [await getEmbed()], components: [row] });
     reply
-      .createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 })
+      .createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {
+        if (i.user.id !== interaction.user.id)
+          return await errorEmbed(i, "You aren't the person who executed this command.");
+
+        setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
         switch (i.customId) {
           case "left":
             page--;

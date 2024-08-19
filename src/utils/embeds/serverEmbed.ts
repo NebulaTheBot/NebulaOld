@@ -1,6 +1,5 @@
 import { EmbedBuilder, type Guild } from "discord.js";
 import { genColor } from "../colorGen";
-import { getSetting } from "../database/settings";
 import { imageColor } from "../imageColor";
 
 type Options = {

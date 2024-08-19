@@ -17,7 +17,7 @@ export async function sendChannelNews(
   body?: string
 ) {
   const news = get(id)!;
-  const role = getSetting(guild.id, "news", "role_id");
+  const role = getSetting(guild.id, "news", "role_id") as string;
   let roleToSend: Role | undefined;
   if (role) roleToSend = guild.roles.cache.get(role);
 
@@ -31,7 +31,7 @@ export async function sendChannelNews(
 
   return (
     guild.channels.cache.get(
-      getSetting(guild.id, "news", "channel_id")! ?? interaction.channel?.id
+      (getSetting(guild.id, "news", "channel_id") as string) ?? interaction.channel?.id
     ) as TextChannel
   )
     .send({

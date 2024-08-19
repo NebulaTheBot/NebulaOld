@@ -23,10 +23,10 @@ export default class Warns {
     const guild = interaction.guild!;
     if (
       !guild.members.cache
-        .get(interaction.member?.user.id!)
+        .get(interaction.user.id)
         ?.permissions.has(PermissionsBitField.Flags.ModerateMembers)
     )
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "You can't execute this command.",
         "You need the **Moderate Members** permission."

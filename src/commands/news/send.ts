@@ -25,7 +25,7 @@ export default class Send {
     const guild = interaction.guild!;
     const member = guild.members.cache.get(interaction.user.id)!;
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "You can't execute this command.",
         "You need the **Manage Server** permission."
@@ -68,7 +68,7 @@ export default class Send {
 
       await sendChannelNews(guild, id, interaction).catch(err => console.error(err));
       await i.reply({
-        embeds: [new EmbedBuilder().setTitle("News sent!").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("News sent.").setColor(genColor(100))]
       });
     });
   }

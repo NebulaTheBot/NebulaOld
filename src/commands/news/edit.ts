@@ -36,7 +36,7 @@ export default class Edit {
         .guild!.members.cache.get(interaction.user.id)!
         .permissions.has(PermissionsBitField.Flags.ManageGuild)
     )
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "You can't execute this command.",
         "You need the **Manage Server** permission."
@@ -45,7 +45,7 @@ export default class Edit {
     const guild = interaction.guild!;
     const id = interaction.options.getString("id", true).trim();
     const news = get(id);
-    if (!news) return errorEmbed(interaction, "The specified news doesn't exist.");
+    if (!news) return await errorEmbed(interaction, "The specified news don't exist.");
 
     const editModal = new ModalBuilder()
       .setCustomId("editnews")
@@ -108,7 +108,7 @@ export default class Edit {
 
       updateNews(id, title, body);
       await interaction.reply({
-        embeds: [new EmbedBuilder().setTitle("News edited!").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("News edited.").setColor(genColor(100))]
       });
     });
   }

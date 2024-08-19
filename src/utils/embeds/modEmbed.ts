@@ -28,21 +28,21 @@ export async function errorCheck(
   const { allErrors, botError, ownerError } = errorOptions;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
-  const member = members.get(interaction.member?.user.id!)!;
-  const client = members.get(interaction.client.user.id!)!;
+  const member = members.get(interaction.user.id)!;
+  const client = members.get(interaction.client.user.id)!;
   const target = members.get(user.id)!;
   const name = user.displayName;
 
   if (botError)
     if (!client.permissions.has(permission))
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         "The bot can't execute this command.",
         `The bot is missing the **${permissionAction}** permission.`
       );
 
   if (!member.permissions.has(permission))
-    return errorEmbed(
+    return await errorEmbed(
       interaction,
       "You can't execute this command.",
       `You're missing the **${permissionAction} Members** permission.`
@@ -51,20 +51,20 @@ export async function errorCheck(
   if (!allErrors) return;
   if (!target) return;
   if (target === member)
-    return errorEmbed(interaction, `You can't ${action.toLowerCase()} yourself.`);
+    return await errorEmbed(interaction, `You can't ${action.toLowerCase()} yourself.`);
 
   if (target.id === interaction.client.user.id)
-    return errorEmbed(interaction, `You can't ${action.toLowerCase()} Sokora.`);
+    return await errorEmbed(interaction, `You can't ${action.toLowerCase()} Sokora.`);
 
   if (!target.manageable)
-    return errorEmbed(
+    return await errorEmbed(
       interaction,
       `You can't ${action.toLowerCase()} ${name}.`,
       "The member has a higher role position than Sokora."
     );
 
   if (member.roles.highest.position < target.roles.highest.position)
-    return errorEmbed(
+    return await errorEmbed(
       interaction,
       `You can't ${action.toLowerCase()} ${name}.`,
       "The member has a higher role position than you."
@@ -72,7 +72,7 @@ export async function errorCheck(
 
   if (ownerError) {
     if (target.id === guild.ownerId)
-      return errorEmbed(
+      return await errorEmbed(
         interaction,
         `You can't ${action.toLowerCase()} ${name}.`,
         "The member owns the server."

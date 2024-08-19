@@ -82,13 +82,13 @@ export const settingsDefinition: Record<
     }
   },
   welcome: {
-    text: {
+    join_text: {
       type: "TEXT",
-      desc: "The welcome message that is sent when a user joins. You can type (user) to display the username, (count) to display the server count and (servername) to display the server name."
+      desc: "Text sent when a user joins. (user) - username, (count) - member count, (servername) - server name."
     },
-    goodbye_text: {
+    leave_text: {
       type: "TEXT",
-      desc: "The goodbye message that is sent when a user leaves. You can type (user) to display the username, (count) to display the server count and (servername) to display the server name."
+      desc: "Text sent when a user leaves. (user) - username, (count) - member count, (servername) - server name."
     },
     channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." }
   }
