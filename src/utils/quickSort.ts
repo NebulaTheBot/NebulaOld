@@ -23,12 +23,12 @@ function swap(
 }
 
 /**
- * Sorts an array of items and returns the sorted items and corresponding items
- * @param sortItems The items to sort
- * @param corresponding The corresponding items to sort
- * @param leftIndex The left index of the sortItems array
- * @param rightIndex The right index of the sortItems array
- * @returns The sorted items and corresponding items
+ * Sorts an array of items and returns the sorted items and corresponding items.
+ * @param sortItems The items to sort.
+ * @param corresponding The corresponding items to sort.
+ * @param leftIndex The left index of the sortItems array.
+ * @param rightIndex The right index of the sortItems array.
+ * @returns The sorted items and corresponding items.
  */
 export function quickSort(
   sortItems: number[],

@@ -5,7 +5,6 @@ import { imageColor } from "../imageColor";
 type Options = {
   guild: Guild;
   roles?: boolean;
-  showInvite?: boolean;
   page?: number;
   pages?: number;
 };

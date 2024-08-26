@@ -5,7 +5,6 @@ import {
 } from "discord.js";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
-import Unban from "./unban";
 import ms from "ms";
 
 export default class Ban {
@@ -18,7 +17,7 @@ export default class Ban {
         user.setName("user").setDescription("The user that you want to ban.").setRequired(true)
       )
       .addStringOption(string =>
-        string.setName("duration").setDescription("The duration of the ban (e.g 30m, 1d, 2h).")
+        string.setName("duration").setDescription("The duration of the ban (e.g 2mo, 1y).")
       )
       .addStringOption(string =>
         string.setName("reason").setDescription("The reason for the ban.")
@@ -28,18 +27,22 @@ export default class Ban {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
-    const duration = interaction.options.getString("duration", false)!;
+    const duration = interaction.options.getString("duration", false);
 
     if (duration) {
       if (!ms(duration))
         return await errorEmbed(
           interaction,
-          `You can't ban ${user.displayName} temporary.`,
-          "The duration is invalid"
+          `You can't ban ${user.displayName} temporarily.`,
+          "The duration is invalid."
         );
 
-      setTimeout(() => {
-        await guild.members.unban(user.id, reason ?? undefined).catch(error => console.error(error));
+      setTimeout(async () => {
+        await guild.members
+          .unban(user.id, reason ?? undefined)
+          .catch(error => console.error(error));
+
+        await modEmbed({ interaction, user, action: "Unbanned" }, reason);
       }, ms(duration));
     }
 
@@ -56,8 +59,6 @@ export default class Ban {
       ?.ban({ reason: reason ?? undefined })
       .catch(error => console.error(error));
 
-    await modEmbed({ interaction, user, action: "Banned", duration? }, reason );
-    // TODO: Send the user a message when they're banned including the duration
-    }
+    await modEmbed({ interaction, user, action: "Banned", duration }, reason);
   }
 }

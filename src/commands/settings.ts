@@ -58,7 +58,7 @@ export default class Settings {
             break;
           // case "LIST":
           //   const subcommandGroup = new SlashCommandSubcommandGroupBuilder()
-          //     .setName(key)
+          //     .setName(sub)
           //     .setDescription("This subcommand group has no description.");
           default: // Also includes "TEXT"
             subcommand.addStringOption(option =>

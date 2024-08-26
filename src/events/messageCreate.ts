@@ -29,20 +29,21 @@ export default {
       // Levelling
       if (!getSetting(guild.id, "levelling", "enabled")) return;
 
-      const level = getSetting(guild.id, "levelling", "set_level")! as string;
+      const level = getSetting(guild.id, "levelling", "set_level") as string;
       if (level != "" && level != null) {
         const newLevel = kominator(level);
         setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
         setSetting(guild.id, "levelling", "set_level", "");
       }
 
-      const blockedChannels = getSetting(guild.id, "levelling", "block_channels")! as string;
+      const blockedChannels = getSetting(guild.id, "levelling", "block_channels") as string;
       if (blockedChannels != undefined)
         for (const channelID of kominator(blockedChannels))
           if (message.channelId === channelID) return;
 
-      let expGain = getSetting(guild.id, "levelling", "set_xp_gain")! as number;
-      const multiplier = getSetting(guild.id, "levelling", "add_multiplier")! as string;
+      // const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number;
+      let expGain = getSetting(guild.id, "levelling", "set_xp_gain") as number;
+      const multiplier = getSetting(guild.id, "levelling", "add_multiplier") as string;
       if (multiplier != null) {
         const expMultiplier = kominator(multiplier);
 
@@ -53,7 +54,6 @@ export default {
         expGain = expGain * +expMultiplier[0];
       }
 
-      // const cooldown = getSetting(guild.id, "levelling.setCooldown") ?? 4;
       const levelChannelId = getSetting(guild.id, "levelling", "channel");
       const [guildLevel, guildExp] = getLevel(guild.id, author.id);
       const [globalLevel, globalExp] = getLevel("0", author.id);

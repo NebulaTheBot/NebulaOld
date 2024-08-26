@@ -55,11 +55,6 @@ export const settingsDefinition: Record<
       type: "BOOL",
       desc: "Whether or not edited/deleted messages should be logged.",
       val: true
-    },
-    dm_user: {
-      type: "BOOL",
-      desc: "Whether or not should the bot send a DM after a moderation action.",
-      val: true
     }
   },
   news: {
@@ -113,7 +108,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
   let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<
     typeof tableDefinition
   >[];
-  console.log(res);
+
   if (res.length == 0) return null;
   switch (settingsDefinition[key][setting].type) {
     case "TEXT":

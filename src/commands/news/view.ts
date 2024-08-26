@@ -58,7 +58,6 @@ export default class View {
         .setStyle(ButtonStyle.Primary)
     );
 
-    await interaction.reply({ embeds: [embed], components: [row] });
     interaction.channel
       ?.createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {
@@ -66,12 +65,13 @@ export default class View {
           return await errorEmbed(i, "You aren't the person who executed this command.");
 
         setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
-        if (i.customId === "left") {
-          page--;
-          if (page < 1) page = sortedNews.length;
-        } else if (i.customId === "right") {
-          page++;
-          if (page > sortedNews.length) page = 1;
+        switch (i.customId) {
+          case "left":
+            page--;
+            if (page < 1) page = sortedNews.length;
+          case "right":
+            page++;
+            if (page > sortedNews.length) page = 1;
         }
 
         currentNews = sortedNews[page - 1];
@@ -85,7 +85,9 @@ export default class View {
           .setColor(genColor(200));
 
         await interaction.editReply({ embeds: [embed], components: [row] });
-        await i.deferUpdate();
+        await i.update({});
       });
+
+    await interaction.reply({ embeds: [embed], components: [row] });
   }
 }
