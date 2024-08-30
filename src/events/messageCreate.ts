@@ -17,7 +17,7 @@ export default {
       const guild = message.guild!;
 
       // Easter egg handler
-      if (guild.id === "1079612082636472420") {
+      if (guild.id == "1079612082636472420") {
         const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
         for (const easterEggFile of readdirSync(eventsPath))
@@ -30,7 +30,7 @@ export default {
       if (!getSetting(guild.id, "levelling", "enabled")) return;
 
       const level = getSetting(guild.id, "levelling", "set_level") as string;
-      if (level != "" && level != null) {
+      if (level) {
         const newLevel = kominator(level);
         setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
         setSetting(guild.id, "levelling", "set_level", "");
@@ -39,16 +39,16 @@ export default {
       const blockedChannels = getSetting(guild.id, "levelling", "block_channels") as string;
       if (blockedChannels != undefined)
         for (const channelID of kominator(blockedChannels))
-          if (message.channelId === channelID) return;
+          if (message.channelId == channelID) return;
 
       // const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number;
       let expGain = getSetting(guild.id, "levelling", "set_xp_gain") as number;
       const multiplier = getSetting(guild.id, "levelling", "add_multiplier") as string;
-      if (multiplier != null) {
+      if (multiplier) {
         const expMultiplier = kominator(multiplier);
 
-        if (expMultiplier[1] === "channel") if (message.channelId !== expMultiplier[2]) return;
-        if (expMultiplier[1] === "role")
+        if (expMultiplier[1] == "channel") if (message.channelId != expMultiplier[2]) return;
+        if (expMultiplier[1] == "role")
           if (!message.member?.roles.cache.has(expMultiplier[2])) return;
 
         expGain = expGain * +expMultiplier[0];

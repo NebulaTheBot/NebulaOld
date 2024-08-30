@@ -20,11 +20,11 @@ const insertQuery = database.query(
 
 export function getLevel(guildID: string, userID: string): [number, number] {
   const res = getQuery.all(guildID, userID) as TypeOfDefinition<typeof tableDefinition>[];
-  if (res.length == 0) return [0, 0];
+  if (!res.length) return [0, 0];
   return [res[0].level, res[0].exp];
 }
 
 export function setLevel(guildID: string | number, userID: string, level: number, exp: number) {
-  if (getQuery.all(guildID, userID).length != 0) deleteQuery.run(guildID, userID);
+  if (getQuery.all(guildID, userID).length) deleteQuery.run(guildID, userID);
   insertQuery.run(guildID, userID, level, exp);
 }

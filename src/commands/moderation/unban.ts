@@ -29,7 +29,7 @@ export default class Unban {
     const guild = interaction.guild!;
     const target = (await guild.bans.fetch())
       .map(ban => ban.user)
-      .filter(user => user.id === id)[0]!;
+      .filter(user => user.id == id)[0]!;
 
     await errorCheck(
       PermissionsBitField.Flags.BanMembers,
@@ -38,7 +38,7 @@ export default class Unban {
       "Ban Members"
     );
 
-    if (target == undefined)
+    if (!target)
       return await errorEmbed(
         interaction,
         "You can't unban this user.",

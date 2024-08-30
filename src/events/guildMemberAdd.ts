@@ -20,7 +20,7 @@ export default {
       const user = member.user;
       const guild = member.guild;
       const channel = (await member.guild.channels.cache
-        .find(channel => channel.id === id)
+        .find(channel => channel.id == id)
         ?.fetch()) as TextChannel;
 
       if (text?.includes("(name)")) text = text.replaceAll("(name)", user.displayName);

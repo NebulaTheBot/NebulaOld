@@ -18,7 +18,7 @@ import {
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 
 export default class Settings {
-  data: SlashCommandBuilder; //Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
+  data: SlashCommandBuilder;
   constructor() {
     this.data = new SlashCommandBuilder()
       .setName("settings")
@@ -90,7 +90,7 @@ export default class Settings {
     const key = interaction.options.getSubcommand() as keyof typeof settingsDefinition;
     const values = interaction.options.data[0].options!;
     console.log(values);
-    if (values.length == 0) {
+    if (!values.length) {
       const embed = new EmbedBuilder().setTitle(`Settings for ${key}`).setColor(genColor(100));
       const description: string[] = [];
 

@@ -31,10 +31,11 @@ export default class Edit {
   }
 
   async run(interaction: ChatInputCommandInteraction) {
+    const guild = interaction.guild!;
     if (
-      !interaction
-        .guild!.members.cache.get(interaction.user.id)!
-        .permissions.has(PermissionsBitField.Flags.ManageGuild)
+      !guild.members.cache
+        .get(interaction.user.id)
+        ?.permissions.has(PermissionsBitField.Flags.ManageGuild)
     )
       return await errorEmbed(
         interaction,
@@ -42,41 +43,35 @@ export default class Edit {
         "You need the **Manage Server** permission."
       );
 
-    const guild = interaction.guild!;
-    const id = interaction.options.getString("id", true).trim();
+    const id = interaction.options.getString("id")!;
     const news = get(id);
     if (!news) return await errorEmbed(interaction, "The specified news don't exist.");
 
+    const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder()
+        .setCustomId("title")
+        .setMaxLength(100)
+        .setStyle(TextInputStyle.Short)
+        .setLabel("Title")
+        .setValue(news.title)
+        .setRequired(true)
+    );
+
+    const secondActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder()
+        .setCustomId("body")
+        .setMaxLength(4000)
+        .setStyle(TextInputStyle.Paragraph)
+        .setLabel("Content (supports Markdown)")
+        .setValue(news.body)
+        .setRequired(true)
+    );
+
     const editModal = new ModalBuilder()
       .setCustomId("editnews")
-      .setTitle(`Edit news: ${news.title}`);
+      .setTitle(`Edit news: ${news.title}`)
+      .addComponents(firstActionRow, secondActionRow);
 
-    const titleInput = new TextInputBuilder()
-      .setCustomId("title")
-      .setPlaceholder("Title")
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100)
-      .setLabel("Title")
-      .setValue(news.title)
-      .setRequired(true);
-
-    const bodyInput = new TextInputBuilder()
-      .setCustomId("body")
-      .setPlaceholder("Content (markdown)")
-      .setMaxLength(4000)
-      .setStyle(TextInputStyle.Paragraph)
-      .setLabel("Content (markdown)")
-      .setValue(news.body)
-      .setRequired(true);
-
-    const firstActionRow = new ActionRowBuilder().addComponents(
-      titleInput
-    ) as ActionRowBuilder<TextInputBuilder>;
-    const secondActionRow = new ActionRowBuilder().addComponents(
-      bodyInput
-    ) as ActionRowBuilder<TextInputBuilder>;
-
-    editModal.addComponents(firstActionRow, secondActionRow);
     await interaction.showModal(editModal).catch(err => console.error(err));
     interaction.client.once("interactionCreate", async i => {
       if (!i.isModalSubmit()) return;
@@ -86,8 +81,9 @@ export default class Edit {
       if (role) roleToSend = guild.roles.cache.get(role);
       const title = i.fields.getTextInputValue("title");
       const body = i.fields.getTextInputValue("body");
-      const newsEditable = getSetting(guild.id, "news", "edit_original_message");
-      if (newsEditable === false) await sendChannelNews(guild, id, interaction, title, body);
+
+      if (!getSetting(guild.id, "news", "edit_original_message"))
+        await sendChannelNews(guild, id, interaction, title, body);
 
       const embed = new EmbedBuilder()
         .setAuthor({ name: `•  ${news.author}`, iconURL: news.authorPFP })
@@ -108,7 +104,8 @@ export default class Edit {
 
       updateNews(id, title, body);
       await interaction.reply({
-        embeds: [new EmbedBuilder().setTitle("News edited.").setColor(genColor(100))]
+        embeds: [new EmbedBuilder().setTitle("News edited.").setColor(genColor(100))],
+        ephemeral: true
       });
     });
   }

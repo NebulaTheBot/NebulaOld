@@ -36,7 +36,6 @@ export default class Purge {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const amount = interaction.options.getNumber("amount")!;
     if (
       !guild.members.cache
         .get(interaction.user.id)
@@ -48,6 +47,7 @@ export default class Purge {
         "You need the **Manage Messages** permission."
       );
 
+    const amount = interaction.options.getNumber("amount")!;
     if (amount > 100)
       return await errorEmbed(interaction, "You can only purge up to 100 messages at a time.");
 
@@ -66,7 +66,7 @@ export default class Purge {
       .setColor(genColor(100));
 
     if (
-      channel.type === ChannelType.GuildText &&
+      channel.type == ChannelType.GuildText &&
       ChannelType.PublicThread &&
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice

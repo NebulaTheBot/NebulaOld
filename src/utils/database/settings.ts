@@ -109,14 +109,12 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     typeof tableDefinition
   >[];
 
-  if (res.length == 0) return null;
+  if (!res.length) return null;
   switch (settingsDefinition[key][setting].type) {
     case "TEXT":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
-      return (
-        res[0].value != null && res[0].value != "" && res[0].value != "false" ? "true" : "false"
-      ) as TypeOfKey<K>;
+      return (res[0].value ? "true" : "false") as TypeOfKey<K>;
     case "INTEGER":
       return parseInt(res[0].value) as TypeOfKey<K>;
     case "LIST":

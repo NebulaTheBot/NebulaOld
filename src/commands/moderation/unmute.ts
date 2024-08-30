@@ -28,7 +28,7 @@ export default class Unmute {
       "Moderate Members"
     );
 
-    if (target.communicationDisabledUntil === null)
+    if (!target.communicationDisabledUntil)
       return await errorEmbed(
         interaction,
         "You can't unmute this user.",

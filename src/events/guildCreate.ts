@@ -35,7 +35,7 @@ export default {
       await new Commands(guild.client).registerCommandsForGuild(guild);
       for (const key in settingsDefinition)
         for (const setting in settingsDefinition[key]) {
-          if (settingsDefinition[key][setting].type !== "LIST") continue;
+          if (settingsDefinition[key][setting].type != "LIST") continue;
           if (!getSetting(guild.id, key, setting)) continue;
           setSetting(guild.id, key, setting, settingsDefinition[key][setting].val);
         }

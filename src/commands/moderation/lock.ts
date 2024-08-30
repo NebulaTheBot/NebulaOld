@@ -62,7 +62,7 @@ export default class Lock {
       .setColor(genColor(100));
 
     if (
-      channel.type === ChannelType.GuildText &&
+      channel.type == ChannelType.GuildText &&
       ChannelType.PublicThread &&
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice

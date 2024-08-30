@@ -28,8 +28,8 @@ export default class About {
           name: "📃 • General",
           value: [
             "**Version** 0.1-preview, *Kaishi*",
-            `**${members}** members • **${guilds.size}** guild${guilds.size === 1 ? "" : "s"} ${
-              shards == undefined ? "" : `• **${shards}** shard${shards === 1 ? "" : "s"}`
+            `**${members}** members • **${guilds.size}** guild${guilds.size == 1 ? "" : "s"} ${
+              !shards ? "" : `• **${shards}** shard${shards == 1 ? "" : "s"}`
             }`
           ].join("\n")
         },

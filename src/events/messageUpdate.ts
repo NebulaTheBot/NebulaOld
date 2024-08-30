@@ -1,6 +1,7 @@
-import { codeBlock, EmbedBuilder, type Message, type TextChannel, type Channel } from "discord.js";
+import { codeBlock, EmbedBuilder, type Message } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { getSetting } from "../utils/database/settings";
+import { logChannel } from "../utils/logChannel";
 
 export default {
   name: "messageUpdate",
@@ -10,14 +11,11 @@ export default {
       if (author.bot) return;
 
       const guild = oldMessage.guild!;
-      const logUpdate = getSetting(guild.id, "moderation", "log_messages");
-      const logChannel = getSetting(guild.id, "moderation", "channel");
-      if (!logUpdate) return;
-      if (!logChannel) return;
+      if (!getSetting(guild.id, "moderation", "log_messages")) return;
 
       const oldContent = oldMessage.content;
       const newContent = newMessage.content;
-      if (oldContent === newContent) return;
+      if (oldContent == newContent) return;
 
       const embed = new EmbedBuilder()
         .setAuthor({ name: `•  ${author.displayName}`, iconURL: author.displayAvatarURL() })
@@ -36,16 +34,7 @@ export default {
         .setThumbnail(author.displayAvatarURL())
         .setColor(genColor(60));
 
-      const channel = await guild.channels.cache
-        .get(`${logChannel}`)
-        ?.fetch()
-        .then((channel: Channel) => {
-          return channel as TextChannel;
-        })
-        .catch(() => null);
-
-      if (!channel) return;
-      await channel.send({ embeds: [embed] });
+      await logChannel(guild, embed);
     }
   }
 };

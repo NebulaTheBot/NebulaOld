@@ -4,9 +4,9 @@ import {
   ButtonInteraction,
   ButtonStyle,
   EmbedBuilder,
-  SlashCommandOptionsOnlyBuilder,
   SlashCommandBuilder,
-  type ChatInputCommandInteraction
+  type ChatInputCommandInteraction,
+  type SlashCommandOptionsOnlyBuilder
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { getLevel, setLevel } from "../utils/database/levelling";
@@ -25,14 +25,9 @@ export default class User {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const target = guild.members.cache
-      .filter(
-        member =>
-          member.user.id === (interaction.options.getUser("user")?.id ?? interaction.user.id)
-      )
-      .map(user => user)[0]!;
+    const user = interaction.options.getUser("user")!;
+    const target = guild.members.cache.get(user.id)!;
 
-    const selectedUser = await target.user.fetch();
     let serverInfo = [`Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`];
     const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
     const memberRoles = [...guildRoles].sort(
@@ -40,13 +35,13 @@ export default class User {
     );
     memberRoles.pop();
 
-    if (target.premiumSinceTimestamp != null)
+    if (target.premiumSinceTimestamp)
       serverInfo.push(`Boosting since **${target.premiumSinceTimestamp}**`);
 
-    if (memberRoles.length !== 0)
+    if (memberRoles.length)
       serverInfo.push(
         `**${guildRoles.filter(role => target.roles.cache.has(role.id)).size! - 1}** ${
-          memberRoles.length === 1 ? "role" : "roles"
+          memberRoles.length == 1 ? "role" : "roles"
         } • ${memberRoles
           .slice(0, 5)
           .map(role => `<@&${role[1].id}>`)
@@ -54,24 +49,22 @@ export default class User {
       );
 
     const embedColor =
-      selectedUser.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200);
+      user.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200);
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `•  ${target.nickname ?? selectedUser.displayName}`,
+        name: `•  ${target.nickname ?? user.displayName}`,
         iconURL: target.displayAvatarURL()
       })
       .setFields(
         {
           name: `<:discord:1266797021126459423> • Discord info`,
           value: [
-            `Username is **${selectedUser.username}**`,
+            `Username is **${user.username}**`,
             `Display name is ${
-              selectedUser.displayName === selectedUser.username
-                ? "*not there*"
-                : `**${selectedUser.displayName}**`
+              user.displayName == user.username ? "*not there*" : `**${user.displayName}**`
             }`,
-            `Created on **<t:${Math.round(selectedUser.createdAt.valueOf() / 1000)}:D>**`
+            `Created on **<t:${Math.round(user.createdAt.valueOf() / 1000)}:D>**`
           ].join("\n")
         },
         {
@@ -83,7 +76,7 @@ export default class User {
       .setThumbnail(target.displayAvatarURL()!)
       .setColor(embedColor);
 
-    if (!getSetting(`${guild.id}`, "levelling", "enabled") && selectedUser.bot) return;
+    if (!getSetting(`${guild.id}`, "levelling", "enabled") && user.bot) return;
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("general")
@@ -108,20 +101,27 @@ export default class User {
       "en-US"
     );
 
-    interaction.channel
-      ?.createMessageComponentCollector({ time: 60000 })
+    const reply = await interaction.reply({ embeds: [embed], components: [row] });
+    reply
+      .createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {
-        if (i.user.id !== interaction.user.id)
+        if (i.message.id != (await reply.fetch()).id)
+          return await errorEmbed(
+            i,
+            "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
+          );
+
+        if (i.user.id != interaction.user.id)
           return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
-        i.customId === "general"
+        setTimeout(async () => await i.update({ components: [] }), 60000);
+        i.customId == "general"
           ? row.components[0].setDisabled(true)
           : row.components[1].setDisabled(true);
 
         const levelEmbed = new EmbedBuilder()
           .setAuthor({
-            name: `•  ${target.nickname ?? selectedUser.displayName}`,
+            name: `•  ${target.nickname ?? user.displayName}`,
             iconURL: target.displayAvatarURL()
           })
           .setFields(
@@ -149,17 +149,13 @@ export default class User {
         switch (i.customId) {
           case "general":
             row.components[1].setDisabled(false);
-            await interaction.editReply({ embeds: [embed], components: [row] });
+            await i.update({ embeds: [embed], components: [row] });
             break;
           case "level":
             row.components[0].setDisabled(false);
-            await interaction.editReply({ embeds: [levelEmbed], components: [row] });
+            await i.update({ embeds: [levelEmbed], components: [row] });
             break;
         }
-
-        await i.update({});
       });
-
-    await interaction.reply({ embeds: [embed], components: [row] });
   }
 }

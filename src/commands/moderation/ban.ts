@@ -27,7 +27,7 @@ export default class Ban {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
-    const duration = interaction.options.getString("duration", false);
+    const duration = interaction.options.getString("duration");
 
     if (duration) {
       if (!ms(duration))

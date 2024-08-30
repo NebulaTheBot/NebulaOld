@@ -28,11 +28,11 @@ export default class View {
     const sortedNews = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
     let currentNews = sortedNews[page - 1];
 
-    if (!news || !sortedNews || sortedNews.length == 0)
+    if (!news || !sortedNews || !sortedNews.length)
       return await errorEmbed(
         interaction,
         "No news found.",
-        "Admins can add news with the **/news send** command."
+        "Admins can add news with the **/news add** command."
       );
 
     if (page > sortedNews.length) page = sortedNews.length;
@@ -58,13 +58,20 @@ export default class View {
         .setStyle(ButtonStyle.Primary)
     );
 
-    interaction.channel
-      ?.createMessageComponentCollector({ time: 60000 })
+    const reply = await interaction.reply({ embeds: [embed], components: [row] });
+    reply
+      .createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {
-        if (i.user.id !== interaction.user.id)
+        if (i.message.id != (await reply.fetch()).id)
+          return await errorEmbed(
+            i,
+            "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
+          );
+
+        if (i.user.id != interaction.user.id)
           return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await interaction.editReply({ components: [] }), 60000);
+        setTimeout(async () => await i.update({ components: [] }), 60000);
         switch (i.customId) {
           case "left":
             page--;
@@ -84,10 +91,7 @@ export default class View {
           .setFooter({ text: `Page ${page} of ${sortedNews.length} • ID: ${currentNews.id}` })
           .setColor(genColor(200));
 
-        await interaction.editReply({ embeds: [embed], components: [row] });
-        await i.update({});
+        await i.update({ embeds: [embed], components: [row] });
       });
-
-    await interaction.reply({ embeds: [embed], components: [row] });
   }
 }

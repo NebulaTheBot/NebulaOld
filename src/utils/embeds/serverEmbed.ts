@@ -31,11 +31,10 @@ export async function serverEmbed(options: Options) {
 
   const channels = guild.channels.cache;
   const channelSizes = {
-    text: channels.filter(
-      channel => channel.type === 0 || channel.type === 15 || channel.type === 5
-    ).size,
-    voice: channels.filter(channel => channel.type === 2 || channel.type === 13).size,
-    categories: channels.filter(channel => channel.type === 4).size
+    text: channels.filter(channel => channel.type == 0 || channel.type == 15 || channel.type == 5)
+      .size,
+    voice: channels.filter(channel => channel.type == 2 || channel.type == 13).size,
+    categories: channels.filter(channel => channel.type == 4).size
   };
 
   const generalValues = [
@@ -56,9 +55,9 @@ export async function serverEmbed(options: Options) {
 
   if (options.roles)
     embed.addFields({
-      name: `🎭 • ${roles.size - 1} ${roles.size === 1 ? "role" : "roles"}`,
+      name: `🎭 • ${roles.size - 1} ${roles.size == 1 ? "role" : "roles"}`,
       value:
-        roles.size === 1
+        roles.size == 1
           ? "*None*"
           : `${sortedRoles
               .slice(0, 5)
@@ -84,12 +83,12 @@ export async function serverEmbed(options: Options) {
       inline: true
     },
     {
-      name: `🌟 • ${boostTier == 0 ? "No level" : `Level ${boostTier}`}`,
+      name: `🌟 • ${!boostTier ? "No level" : `Level ${boostTier}`}`,
       value: [
         `**${boostCount}**${
-          boostTier === 0 ? "/2" : boostTier === 1 ? "/7" : boostTier === 2 ? "/14" : ""
+          boostTier == 0 ? "/2" : boostTier == 1 ? "/7" : boostTier == 2 ? "/14" : ""
         } boosts`,
-        `**${boosters.size}** ${boosters.size === 1 ? "booster" : "boosters"}`
+        `**${boosters.size}** ${boosters.size == 1 ? "booster" : "boosters"}`
       ].join("\n"),
       inline: true
     }

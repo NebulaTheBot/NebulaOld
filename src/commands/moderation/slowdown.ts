@@ -42,7 +42,6 @@ export default class Slowdown {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const time = interaction.options.getString("time")!;
     if (
       !guild.members.cache
         .get(interaction.user.id)
@@ -54,14 +53,14 @@ export default class Slowdown {
         "You need the **Manage Channels** permission."
       );
 
+    const time = interaction.options.getString("time")!;
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
 
     let title = `Set a slowdown of \`${channelOption ?? `${channel.name}`}\` to ${ms(ms(time), {
       long: true
     })}.`;
-    if (ms(time) === 0)
-      title = `Removed the slowdown from \`${channelOption ?? `${channel.name}`}\`.`;
+    if (!ms(time)) title = `Removed the slowdown from \`${channelOption ?? `${channel.name}`}\`.`;
 
     const embed = new EmbedBuilder()
       .setTitle(title)
@@ -75,7 +74,7 @@ export default class Slowdown {
       .setColor(genColor(100));
 
     if (
-      channel.type === ChannelType.GuildText &&
+      channel.type == ChannelType.GuildText &&
       ChannelType.PublicThread &&
       ChannelType.PrivateThread &&
       ChannelType.GuildVoice

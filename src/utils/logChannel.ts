@@ -21,7 +21,14 @@ export async function logChannel(guild: Guild, embed: EmbedBuilder) {
     .get(`${logChannel}`)
     ?.fetch()
     .then((channel: Channel) => {
-      if (channel.type != ChannelType.GuildText) return null;
+      if (
+        channel.type != ChannelType.GuildText &&
+        ChannelType.PublicThread &&
+        ChannelType.PrivateThread &&
+        ChannelType.GuildVoice
+      )
+        return null;
+
       return channel as TextChannel;
     })
     .catch(() => null);

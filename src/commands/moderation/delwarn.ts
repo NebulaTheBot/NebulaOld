@@ -32,9 +32,9 @@ export default class Delwarn {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
     const name = user.displayName;
-    const id = interaction.options.getNumber("id", true);
+    const id = interaction.options.getNumber("id");
     const warns = listUserModeration(guild.id, user.id, "WARN");
-    const newWarns = warns.filter(warn => warn.id !== `${id}`);
+    const newWarns = warns.filter(warn => warn.id != `${id}`);
 
     await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
@@ -43,7 +43,7 @@ export default class Delwarn {
       "Moderate Members"
     );
 
-    if (newWarns.length === warns.length)
+    if (newWarns.length == warns.length)
       return await errorEmbed(interaction, `There is no warn with the id of ${id}.`);
 
     const embed = new EmbedBuilder()

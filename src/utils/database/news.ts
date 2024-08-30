@@ -24,7 +24,7 @@ const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 
-export function sendNews(
+export function addNews(
   guildID: string,
   title: string,
   body: string,
