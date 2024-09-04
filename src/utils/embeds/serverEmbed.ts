@@ -86,7 +86,7 @@ export async function serverEmbed(options: Options) {
       name: `🌟 • ${!boostTier ? "No level" : `Level ${boostTier}`}`,
       value: [
         `**${boostCount}**${
-          boostTier == 0 ? "/2" : boostTier == 1 ? "/7" : boostTier == 2 ? "/14" : ""
+          !boostTier ? "/2" : boostTier == 1 ? "/7" : boostTier == 2 ? "/14" : ""
         } boosts`,
         `**${boosters.size}** ${boosters.size == 1 ? "booster" : "boosters"}`
       ].join("\n"),

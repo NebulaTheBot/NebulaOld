@@ -37,7 +37,11 @@ export default class Serverboard {
 
     const argPage = interaction.options.getNumber("page") as number;
     let page = (argPage - 1 <= 0 ? 0 : argPage - 1 > pages ? pages - 1 : argPage - 1) || 0;
-    const embed = await serverEmbed({ guild: guildList[page], page: page + 1, pages });
+
+    async function getEmbed() {
+      return await serverEmbed({ guild: guildList[page], page: page + 1, pages });
+    }
+
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("left")
@@ -49,7 +53,7 @@ export default class Serverboard {
         .setStyle(ButtonStyle.Primary)
     );
 
-    const reply = await interaction.reply({ embeds: [embed], components: [row] });
+    const reply = await interaction.reply({ embeds: [await getEmbed()], components: [row] });
     reply
       .createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {
@@ -62,17 +66,19 @@ export default class Serverboard {
         if (i.user.id != interaction.user.id)
           return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await i.update({ components: [] }), 60000);
+        setTimeout(async () => await i.editReply({ components: [] }), 60000);
         switch (i.customId) {
           case "left":
             page--;
             if (page < 0) page = pages - 1;
+            break;
           case "right":
             page++;
             if (page >= pages) page = 0;
+            break;
         }
 
-        await i.update({ embeds: [embed], components: [row] });
+        await i.update({ embeds: [await getEmbed()], components: [row] });
       });
   }
 }

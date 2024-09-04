@@ -25,9 +25,13 @@ export default class User {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const user = interaction.options.getUser("user")!;
-    const target = guild.members.cache.get(user.id)!;
+    const target = guild.members.cache
+      .filter(
+        member => member.id == (interaction.options.getUser("user")?.id ?? interaction.user.id)
+      )
+      .map(user => user)[0];
 
+    const user = await target.user.fetch();
     let serverInfo = [`Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`];
     const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
     const memberRoles = [...guildRoles].sort(
@@ -114,7 +118,7 @@ export default class User {
         if (i.user.id != interaction.user.id)
           return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await i.update({ components: [] }), 60000);
+        setTimeout(async () => await i.editReply({ components: [] }), 60000);
         i.customId == "general"
           ? row.components[0].setDisabled(true)
           : row.components[1].setDisabled(true);

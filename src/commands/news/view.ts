@@ -26,7 +26,6 @@ export default class View {
     let page = interaction.options.getNumber("page") ?? 1;
     const news = listAllNews(interaction.guild?.id!);
     const sortedNews = (Object.values(news) as any[])?.sort((a, b) => b.createdAt - a.createdAt);
-    let currentNews = sortedNews[page - 1];
 
     if (!news || !sortedNews || !sortedNews.length)
       return await errorEmbed(
@@ -38,14 +37,17 @@ export default class View {
     if (page > sortedNews.length) page = sortedNews.length;
     if (page < 1) page = 1;
 
-    let embed = new EmbedBuilder()
-      .setAuthor({ name: `•  ${currentNews.author}`, iconURL: currentNews.authorPFP })
-      .setTitle(currentNews.title)
-      .setDescription(currentNews.body)
-      .setImage(currentNews.imageURL || null)
-      .setTimestamp(parseInt(currentNews.updatedAt))
-      .setFooter({ text: `Page ${page} of ${sortedNews.length} • ID: ${currentNews.id}` })
-      .setColor(genColor(200));
+    function getEmbed() {
+      const currentNews = sortedNews[page - 1];
+      return new EmbedBuilder()
+        .setAuthor({ name: `•  ${currentNews.author}`, iconURL: currentNews.authorPFP })
+        .setTitle(currentNews.title)
+        .setDescription(currentNews.body)
+        .setImage(currentNews.imageURL || null)
+        .setTimestamp(parseInt(currentNews.updatedAt))
+        .setFooter({ text: `Page ${page} of ${sortedNews.length} • ID: ${currentNews.id}` })
+        .setColor(genColor(200));
+    }
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
@@ -58,7 +60,7 @@ export default class View {
         .setStyle(ButtonStyle.Primary)
     );
 
-    const reply = await interaction.reply({ embeds: [embed], components: [row] });
+    const reply = await interaction.reply({ embeds: [getEmbed()], components: [row] });
     reply
       .createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {
@@ -71,27 +73,19 @@ export default class View {
         if (i.user.id != interaction.user.id)
           return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await i.update({ components: [] }), 60000);
+        setTimeout(async () => await i.editReply({ components: [] }), 60000);
         switch (i.customId) {
           case "left":
             page--;
             if (page < 1) page = sortedNews.length;
+            await i.update({ embeds: [getEmbed()], components: [row] });
+            break;
           case "right":
             page++;
             if (page > sortedNews.length) page = 1;
+            await i.update({ embeds: [getEmbed()], components: [row] });
+            break;
         }
-
-        currentNews = sortedNews[page - 1];
-        embed = new EmbedBuilder()
-          .setAuthor({ name: `•  ${currentNews.author}`, iconURL: currentNews.authorPFP })
-          .setTitle(currentNews.title)
-          .setDescription(currentNews.body)
-          .setImage(currentNews.imageURL || null)
-          .setTimestamp(parseInt(currentNews.updatedAt))
-          .setFooter({ text: `Page ${page} of ${sortedNews.length} • ID: ${currentNews.id}` })
-          .setColor(genColor(200));
-
-        await i.update({ embeds: [embed], components: [row] });
       });
   }
 }
