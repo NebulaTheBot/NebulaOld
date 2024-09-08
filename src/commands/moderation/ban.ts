@@ -6,6 +6,7 @@ import {
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import ms from "ms";
+import { addModeration } from "../../utils/database/moderation";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -53,12 +54,30 @@ export default class Ban {
       "Ban Members"
     ) == null) {
       const reason = interaction.options.getString("reason");
+      const dmChannel = await user.createDM().catch(() => null);
+      if (dmChannel && !user.bot) {
+        await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+      }
+
       await interaction.guild?.members.cache
         .get(user.id)
         ?.ban({ reason: reason ?? undefined })
         .catch(error => console.error(error));
   
-      await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+        try {
+          addModeration(
+            guild.id,
+            user.id,
+            "BAN",
+            guild.members.cache.get(interaction.user.id)?.id!,
+            reason ?? undefined
+          );
+        } catch (error) {
+          console.error(error);
+        }
+      
+      if (!dmChannel || user.bot)
+        await modEmbed({ interaction, user, action: "Banned", duration }, reason);
     }
   }
 }

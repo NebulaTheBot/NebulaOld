@@ -42,6 +42,17 @@ export default {
         );
 
       await channel.send({ embeds: [embed] });
+
+      const dmwelcome = getSetting(guildID, "welcome", "join_dm") as boolean;
+      if (!dmwelcome) return;
+      // use join_text, the embed should be already cooked
+      console.log("zioeuhzioeufgzhoifeunho")
+      const dmChannel = await user.createDM().catch(() => null);
+      if (!dmChannel) return;
+      if (user.bot) return;
+      await dmChannel
+        .send({ embeds: [embed] })
+        .catch(() => null);
     }
   }
 };

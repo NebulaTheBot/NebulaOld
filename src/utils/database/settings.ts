@@ -85,7 +85,15 @@ export const settingsDefinition: Record<
       type: "TEXT",
       desc: "Text sent when a user leaves. (user) - username, (count) - member count, (servername) - server name."
     },
-    channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." }
+    channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." },
+    join_dm: {
+      type: "BOOL",
+      desc: "Whether to send a custom DM message to the user upon joinning"
+    },
+    dm_text: {
+      type: "TEXT",
+      desc: "Text sent in the user's dm when they join the server. Same replacements as leave_text."
+    }
   }
 };
 
