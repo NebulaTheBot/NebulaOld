@@ -46,19 +46,19 @@ export default class Ban {
       }, ms(duration));
     }
 
-    await errorCheck(
+    if (await errorCheck(
       PermissionsBitField.Flags.BanMembers,
       { interaction, user, action: "Ban" },
       { allErrors: true, botError: true, ownerError: true },
       "Ban Members"
-    );
-
-    const reason = interaction.options.getString("reason");
-    await interaction.guild?.members.cache
-      .get(user.id)
-      ?.ban({ reason: reason ?? undefined })
-      .catch(error => console.error(error));
-
-    await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+    ) == null) {
+      const reason = interaction.options.getString("reason");
+      await interaction.guild?.members.cache
+        .get(user.id)
+        ?.ban({ reason: reason ?? undefined })
+        .catch(error => console.error(error));
+  
+      await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+    }
   }
 }

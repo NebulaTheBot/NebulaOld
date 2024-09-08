@@ -17,6 +17,9 @@ export default class Warn {
       )
       .addStringOption(string =>
         string.setName("reason").setDescription("The reason for the warn.")
+      )
+      .addBooleanOption(bool =>
+        bool.setName("show_moderator").setDescription("Inform the warned user of the moderator that took the action. Defaults to false")
       );
   }
 
@@ -24,26 +27,27 @@ export default class Warn {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
     const reason = interaction.options.getString("reason");
+    const showModerator = interaction.options.getBoolean("show_moderator") ?? false;
 
-    await errorCheck(
+    if (await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Warn" },
       { allErrors: true, botError: false, ownerError: true },
       "Moderate Members"
-    );
-
-    try {
-      addModeration(
-        guild.id,
-        user.id,
-        "WARN",
-        guild.members.cache.get(interaction.user.id)?.id!,
-        reason ?? undefined
-      );
-    } catch (error) {
-      console.error(error);
+    ) == null) {
+      try {
+        addModeration(
+          guild.id,
+          user.id,
+          "WARN",
+          guild.members.cache.get(interaction.user.id)?.id!,
+          reason ?? undefined
+        );
+      } catch (error) {
+        console.error(error);
+      }
+  
+      await modEmbed({ interaction, user, action: "Warned" }, reason, false, showModerator);
     }
-
-    await modEmbed({ interaction, user, action: "Warned" }, reason);
   }
 }

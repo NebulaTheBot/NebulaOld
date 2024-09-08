@@ -31,21 +31,21 @@ export default class Unban {
       .map(ban => ban.user)
       .filter(user => user.id == id)[0]!;
 
-    await errorCheck(
+    if (await errorCheck(
       PermissionsBitField.Flags.BanMembers,
       { interaction, user: target, action: "Unban" },
       { allErrors: false, botError: true, ownerError: true },
       "Ban Members"
-    );
-
-    if (!target)
-      return await errorEmbed(
-        interaction,
-        "You can't unban this user.",
-        "The user was never banned."
-      );
-
-    await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));
-    await modEmbed({ interaction, user: target, action: "Unbanned" }, reason);
+    ) == null) {
+      if (!target)
+        return await errorEmbed(
+          interaction,
+          "You can't unban this user.",
+          "The user was never banned."
+        );
+  
+      await guild.members.unban(id, reason ?? undefined).catch(error => console.error(error));
+      await modEmbed({ interaction, user: target, action: "Unbanned" }, reason);
+    }
   }
 }

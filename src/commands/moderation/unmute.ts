@@ -21,21 +21,21 @@ export default class Unmute {
     const user = interaction.options.getUser("user")!;
     const target = interaction.guild?.members.cache.get(user.id)!;
 
-    errorCheck(
+    if (await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Unmute" },
       { allErrors: false, botError: true, ownerError: false },
       "Moderate Members"
-    );
-
-    if (!target.communicationDisabledUntil)
-      return await errorEmbed(
-        interaction,
-        "You can't unmute this user.",
-        "The user was never muted."
-      );
-
-    await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
-    await modEmbed({ interaction, user, action: "Unmuted" }, undefined, true);
+    ) == null) {
+      if (!target.communicationDisabledUntil)
+        return await errorEmbed(
+          interaction,
+          "You can't unmute this user.",
+          "The user was never muted."
+        );
+  
+      await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
+      await modEmbed({ interaction, user, action: "Unmuted" }, undefined, true);
+    }
   }
 }

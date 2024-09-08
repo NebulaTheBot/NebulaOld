@@ -22,19 +22,19 @@ export default class Kick {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
 
-    await errorCheck(
+    if (await errorCheck(
       PermissionsBitField.Flags.KickMembers,
       { interaction, user, action: "Kick" },
       { allErrors: true, botError: true, ownerError: true },
       "Kick Members"
-    );
-
-    const reason = interaction.options.getString("reason");
-    await interaction.guild?.members.cache
-      .get(user.id)
-      ?.kick(reason ?? undefined)
-      .catch(error => console.error(error));
-
-    await modEmbed({ interaction, user, action: "Kicked" }, reason);
+    ) == null) {
+      const reason = interaction.options.getString("reason");
+      await interaction.guild?.members.cache
+        .get(user.id)
+        ?.kick(reason ?? undefined)
+        .catch(error => console.error(error));
+  
+      await modEmbed({ interaction, user, action: "Kicked" }, reason);
+    }
   }
 }

@@ -6,6 +6,7 @@ import {
 import ms from "ms";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
+import { addModeration } from "../../utils/database/moderation";
 
 export default class Mute {
   data: SlashCommandSubcommandBuilder;
@@ -32,29 +33,44 @@ export default class Mute {
     const duration = interaction.options.getString("duration")!;
     const reason = interaction.options.getString("reason");
 
-    await errorCheck(
+    if (await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Mute" },
       { allErrors: true, botError: true, ownerError: true },
       "Moderate Members"
-    );
+    ) == null) {
 
-    if (!ms(duration) || ms(duration) > ms("28d"))
-      return await errorEmbed(
-        interaction,
-        `You can't mute ${user.displayName}.`,
-        "The duration is invalid or is above the 28 day limit."
-      );
+      if (!ms(duration) || ms(duration) > ms("28d"))
+        return await errorEmbed(
+          interaction,
+          `You can't mute ${user.displayName}.`,
+          "The duration is invalid or is above the 28 day limit."
+        );
+  
+      const time = new Date(
+        Date.parse(new Date().toISOString()) + Date.parse(new Date(ms(duration)).toISOString())
+      ).toISOString();
+  
+      await interaction.guild?.members.cache
+        .get(user.id)
+        ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined })
+        .catch(error => console.error(error));
 
-    const time = new Date(
-      Date.parse(new Date().toISOString()) + Date.parse(new Date(ms(duration)).toISOString())
-    ).toISOString();
+      const guild = interaction.guild!;
 
-    await interaction.guild?.members.cache
-      .get(user.id)
-      ?.edit({ communicationDisabledUntil: time, reason: reason ?? undefined })
-      .catch(error => console.error(error));
-
-    await modEmbed({ interaction, user, action: "Muted", duration }, reason);
+      try {
+        addModeration(
+          guild.id,
+          user.id,
+          "MUTE",
+          guild.members.cache.get(interaction.user.id)?.id!,
+          reason ?? undefined
+        );
+      } catch (error) {
+        console.error(error);
+      }
+  
+      await modEmbed({ interaction, user, action: "Muted", duration }, reason);
+    }
   }
 }

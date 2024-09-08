@@ -79,12 +79,12 @@ export async function errorCheck(
   }
 }
 
-export async function modEmbed(options: Options, reason?: string | null, date?: boolean) {
+export async function modEmbed(options: Options, reason?: string | null, date?: boolean, showModerator: boolean = false) {
   const { interaction, user, action, duration } = options;
   const guild = interaction.guild!;
   const name = user.displayName;
 
-  const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
+  const generalValues = [`**Moderator**: <@${interaction.user.id}>`];
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
   if (reason) generalValues.push(`**Reason**: ${reason}`);
   if (date) generalValues.push(`**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`);
@@ -106,7 +106,10 @@ export async function modEmbed(options: Options, reason?: string | null, date?: 
   if (user.bot) return;
   await dmChannel
     .send({
-      embeds: [embed.setTitle(`You got ${action.toLowerCase()}.`).setColor(genColor(0))]
+      embeds: [
+        embed.setTitle(`You got ${action.toLowerCase()}.`)
+        .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
+        .setColor(genColor(0))]
     })
     .catch(() => null);
 }
