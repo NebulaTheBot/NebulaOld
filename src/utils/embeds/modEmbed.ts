@@ -25,7 +25,7 @@ export async function errorCheck(
   permissionAction: string
 ) {
   const { interaction, user, action } = options;
-  const { allErrors, botError, ownerError } = errorOptions;
+  const { allErrors, botError, ownerError, outsideError } = errorOptions;
   const guild = interaction.guild!;
   const members = guild.members.cache!;
   const member = members.get(interaction.user.id)!;
@@ -79,7 +79,7 @@ export async function errorCheck(
       );
   }
 
-  if (ownerError) {
+  if (outsideError) {
     if (!await guild.members.fetch(user.id).then(() => true).catch(() => false))
       return await errorEmbed(
         interaction,
