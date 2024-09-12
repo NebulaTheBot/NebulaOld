@@ -14,7 +14,7 @@ export default {
     async run(member: GuildMember) {
       const guildID = member.guild.id;
       const id = getSetting(guildID, "welcome", "channel") as string;
-      let text = getSetting(guildID, "welcome", "text") as string;
+      let text = getSetting(guildID, "welcome", "join_text") as string;
       const user = member.user;
       const guild = member.guild;
       const avatarURL = member.displayAvatarURL();
@@ -35,6 +35,8 @@ export default {
         if (text?.includes("(name)")) text = text.replaceAll("(name)", user.displayName);
         if (text?.includes("(count)")) text = text.replaceAll("(count)", `${guild.memberCount}`);
         if (text?.includes("(servername)")) text = text.replaceAll("(servername)", `${guild.name}`);
+        
+        embed.setDescription(text)
 
         await channel.send({ embeds: [embed] });
       }

@@ -79,21 +79,24 @@ export const settingsDefinition: Record<
   welcome: {
     join_text: {
       type: "TEXT",
-      desc: "Text sent when a user joins. (user) - username, (count) - member count, (servername) - server name."
+      desc: "Text sent when a user joins. (user) - username, (count) - member count, (servername) - server name.",
+      val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Enjoy, and have a nice day!"
     },
     leave_text: {
       type: "TEXT",
-      desc: "Text sent when a user leaves. (user) - username, (count) - member count, (servername) - server name."
+      desc: "Text sent when a user leaves. (user) - username, (count) - member count, (servername) - server name.",
+      val: "(name) has left the server 😥"
     },
     channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." },
     join_dm: {
       type: "BOOL",
-      desc: "Whether to send a custom DM message to the user upon joinning"
+      desc: "Whether to send a custom DM message to the user upon joinning",
+      val: false
     },
     dm_text: {
       type: "TEXT",
       desc: "Text sent in the user's dm when they join the server. Same replacements as leave_text."
-    }
+    } // dm_text is already join_text by default if nothing is supplied, see guildMemberAdd.ts
   }
 };
 

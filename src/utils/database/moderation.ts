@@ -56,8 +56,10 @@ export function listUserModeration(
   return listUserQuery.all(guildID, userID) as TypeOfDefinition<typeof definition>[];
 }
 
-export function getModeration(guildID: number | string, id: string) {
-  return getIdQuery.all(guildID, id) as TypeOfDefinition<typeof definition>[];
+export function getModeration(guildID: number | string, userID: number | string, id: string) {
+  var thecase = getIdQuery.all(guildID, id) as TypeOfDefinition<typeof definition>[];
+  if (thecase[0].user == userID) return thecase;
+  return [];
 }
 
 export function listModeratorLog(guildID: number | string, moderator: number | string) {

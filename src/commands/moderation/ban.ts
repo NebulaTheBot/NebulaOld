@@ -18,10 +18,10 @@ export default class Ban {
         user.setName("user").setDescription("The user that you want to ban.").setRequired(true)
       )
       .addStringOption(string =>
-        string.setName("duration").setDescription("The duration of the ban (e.g 2mo, 1y).")
+        string.setName("reason").setDescription("The reason for the ban.")
       )
       .addStringOption(string =>
-        string.setName("reason").setDescription("The reason for the ban.")
+        string.setName("duration").setDescription("The duration of the ban (e.g 2mo, 1y).")
       );
   }
 
@@ -54,14 +54,13 @@ export default class Ban {
       "Ban Members"
     ) == null) {
       const reason = interaction.options.getString("reason");
-      const dmChannel = await user.createDM().catch(() => null);
+      const dmChannel = await guild.members.cache.get(user.id)?.createDM().catch(() => null);
       if (dmChannel && !user.bot) {
         await modEmbed({ interaction, user, action: "Banned", duration }, reason);
       }
 
-      await interaction.guild?.members.cache
-        .get(user.id)
-        ?.ban({ reason: reason ?? undefined })
+      await interaction.guild?.bans
+        .create(user.id, { reason: reason ?? undefined })
         .catch(error => console.error(error));
   
         try {

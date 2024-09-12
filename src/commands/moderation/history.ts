@@ -55,7 +55,7 @@ export default class History {
     // const kicks = listUserModeration(guild.id, user.id, "KICK");
     // const bans = listUserModeration(guild.id, user.id, "BAN");
     const actionid = interaction.options.getString("id")
-    const allactions = actionid ? getModeration(guild.id, actionid) : listUserModeration(guild.id, user.id);
+    const allactions = actionid ? getModeration(guild.id, user.id, actionid) : listUserModeration(guild.id, user.id);
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
       .setTitle(`Moderation cases of ${user.displayName}`)
