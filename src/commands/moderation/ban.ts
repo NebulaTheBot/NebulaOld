@@ -29,6 +29,7 @@ export default class Ban {
     const user = interaction.options.getUser("user")!;
     const guild = interaction.guild!;
     const duration = interaction.options.getString("duration");
+    const reason = interaction.options.getString("reason");
 
     if (duration) {
       if (!ms(duration))
@@ -50,10 +51,9 @@ export default class Ban {
     if (await errorCheck(
       PermissionsBitField.Flags.BanMembers,
       { interaction, user, action: "Ban" },
-      { allErrors: true, botError: true, ownerError: true },
+      { allErrors: true, botError: true, ownerError: true, outsideError: false },
       "Ban Members"
     ) == null) {
-      const reason = interaction.options.getString("reason");
       const dmChannel = await guild.members.cache.get(user.id)?.createDM().catch(() => null);
       if (dmChannel && !user.bot) {
         await modEmbed({ interaction, user, action: "Banned", duration }, reason);

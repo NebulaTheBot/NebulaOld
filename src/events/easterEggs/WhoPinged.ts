@@ -1,4 +1,4 @@
-import type { Message } from "discord.js";
+import type { Message, TextChannel } from "discord.js";
 import { randomise } from "../../utils/randomise";
 
 export default class WhoPinged {
@@ -15,6 +15,6 @@ export default class WhoPinged {
       "https://tenor.com/view/yakuza-kazuma-kiryu-pissed-off-gif-14586175"
     ]);
 
-    await message.channel.send(gifs);
+    await (message.channel as TextChannel).send(gifs);
   }
 }

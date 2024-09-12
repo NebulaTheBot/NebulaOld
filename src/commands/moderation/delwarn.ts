@@ -39,7 +39,7 @@ export default class Delwarn {
     await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Remove a warn" },
-      { allErrors: true, botError: false, ownerError: false },
+      { allErrors: true, botError: false, ownerError: false, outsideError: false },
       "Moderate Members"
     );
 

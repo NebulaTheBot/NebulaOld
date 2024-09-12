@@ -1,4 +1,4 @@
-import type { Message } from "discord.js";
+import type { Message, TextChannel } from "discord.js";
 import { multiReact } from "../../utils/multiReact";
 
 export default class Bread {
@@ -12,7 +12,7 @@ export default class Bread {
       message.content.toLowerCase() == "bread"
     ) {
       if (Math.round(Math.random() * 100) <= 0.25)
-        message.channel.send("https://tenor.com/bOMAb.gif");
+        (message.channel as TextChannel).send("https://tenor.com/bOMAb.gif");
       else await multiReact(message, "🍞🇧🇷🇪🇦🇩👍");
     }
   }

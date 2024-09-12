@@ -15,6 +15,7 @@ type ErrorOptions = {
   allErrors: boolean;
   botError: boolean;
   ownerError: boolean;
+  outsideError: boolean;
 };
 
 export async function errorCheck(
@@ -75,6 +76,15 @@ export async function errorCheck(
         interaction,
         `You can't ${action.toLowerCase()} ${name}.`,
         "The member owns the server."
+      );
+  }
+
+  if (ownerError) {
+    if (!await guild.members.fetch(user.id).then(() => true).catch(() => false))
+      return await errorEmbed(
+        interaction,
+        `You can't ${action.toLowerCase()} ${name}.`,
+        "This user isn't in this server."
       );
   }
 }

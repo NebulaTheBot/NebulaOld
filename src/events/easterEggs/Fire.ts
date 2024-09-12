@@ -1,4 +1,4 @@
-import type { Message } from "discord.js";
+import type { Message, TextChannel } from "discord.js";
 import { randomise } from "../../utils/randomise";
 
 export default class Fire {
@@ -11,6 +11,6 @@ export default class Fire {
       "https://tenor.com/view/fire-in-the-hole-gif-14799466830322850291"
     ]);
 
-    await message.channel.send(gifs);
+    await (message.channel as TextChannel).send(gifs);
   }
 }

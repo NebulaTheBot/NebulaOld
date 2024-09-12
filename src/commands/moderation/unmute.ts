@@ -24,7 +24,7 @@ export default class Unmute {
     if (await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Unmute" },
-      { allErrors: false, botError: true, ownerError: false },
+      { allErrors: false, botError: true, ownerError: false, outsideError: false },
       "Moderate Members"
     ) == null) {
       if (!target.communicationDisabledUntil)

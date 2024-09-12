@@ -32,7 +32,7 @@ export default class Warn {
     if (await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Warn" },
-      { allErrors: true, botError: false, ownerError: true },
+      { allErrors: true, botError: false, ownerError: true, outsideError: true },
       "Moderate Members"
     ) == null) {
       try {

@@ -34,7 +34,7 @@ export default class Unban {
     if (await errorCheck(
       PermissionsBitField.Flags.BanMembers,
       { interaction, user: target, action: "Unban" },
-      { allErrors: false, botError: true, ownerError: true },
+      { allErrors: false, botError: true, ownerError: true, outsideError: false },
       "Ban Members"
     ) == null) {
       if (!target)

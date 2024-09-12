@@ -1,4 +1,4 @@
-import type { Message } from "discord.js";
+import type { Message, TextChannel } from "discord.js";
 import { randomise } from "../../utils/randomise";
 
 export default class Fan {
@@ -10,6 +10,6 @@ export default class Fan {
       "https://tenor.com/view/below-deck-im-your-biggest-fan-biggest-fan-kate-kate-chastain-gif-15861715"
     ]);
 
-    await message.channel.send(gifs);
+    await (message.channel as TextChannel).send(gifs);
   }
 }

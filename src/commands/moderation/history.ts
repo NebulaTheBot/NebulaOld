@@ -8,11 +8,11 @@ import { genColor } from "../../utils/colorGen";
 import { getModeration, listUserModeration } from "../../utils/database/moderation";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 
-const actionsEmojis = {
+const actionsEmojis: { [key: string]: string } = {
   WARN: "⚠️",
   MUTE: "🔇",
-  KICK: "🦶",
-  BAN: "🔨"
+  KICK: "📤", // looks better than 🦶
+  BAN: "🔨" // or 🚫 ?
 };
 
 const nothingMsg = [
@@ -54,7 +54,8 @@ export default class History {
     // const mutes = listUserModeration(guild.id, user.id, "MUTE");
     // const kicks = listUserModeration(guild.id, user.id, "KICK");
     // const bans = listUserModeration(guild.id, user.id, "BAN");
-    const actionid = interaction.options.getString("id")
+    let actionid = interaction.options.getString("id")
+    if (actionid && actionid?.startsWith("#")) actionid = actionid.slice(1);
     const allactions = actionid ? getModeration(guild.id, user.id, actionid) : listUserModeration(guild.id, user.id);
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
@@ -67,7 +68,7 @@ export default class History {
                 name: `${actionsEmojis[action.type]} ${action.type} #${action.id}`, // Include durations ? needs to add a db column
                 value: [
                   `**Reason**: ${action.reason}`,
-                  `-# __Moderator:__ <@${action.moderator}> | <t:${Math.floor(action.timestamp / 1000)}:f>`
+                  `-# __Moderator:__ <@${action.moderator}> | <t:${Math.floor(Number(action.timestamp) / 1000)}:f>`
                 ].join("\n")
               };
             })

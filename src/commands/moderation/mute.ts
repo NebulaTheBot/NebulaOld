@@ -36,7 +36,7 @@ export default class Mute {
     if (await errorCheck(
       PermissionsBitField.Flags.ModerateMembers,
       { interaction, user, action: "Mute" },
-      { allErrors: true, botError: true, ownerError: true },
+      { allErrors: true, botError: true, ownerError: true, outsideError: false }, // If someone comes back after being kicked but the mods want to make sure they calm down before speaking again
       "Moderate Members"
     ) == null) {
 

@@ -1,4 +1,4 @@
-import type { Message } from "discord.js";
+import type { Message, TextChannel } from "discord.js";
 import { randomise } from "../../utils/randomise";
 
 export default class AmericaYa {
@@ -9,6 +9,6 @@ export default class AmericaYa {
       "https://tenor.com/view/america-ya-gif-15374592095658975433"
     ]);
 
-    await message.channel.send(response);
+    await (message.channel as TextChannel).send(response);
   }
 }
