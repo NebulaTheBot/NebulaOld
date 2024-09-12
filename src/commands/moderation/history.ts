@@ -15,17 +15,24 @@ const actionsEmojis = {
   BAN: "🔨"
 };
 
+const nothingMsg = [
+  "Nothing to see here...",
+  "Ayay, no cases on this horizon cap'n !",
+  "Clean like a whistle !",
+  "What does 0+0= ?"
+]
+
 export default class History {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("history")
-      .setDescription("Moderation actions history of a user.") // Can be misundertood as the user's history, needs changing
+      .setDescription("Moderation cases history of a user.") // Can be misundertood as the user's history, needs changing
       .addUserOption(user =>
         user.setName("user").setDescription("The user that you want to see.").setRequired(true)
       )
       .addStringOption(string =>
-        string.setName("id").setDescription("The ID of a specific moderation action you want to see.")
+        string.setName("id").setDescription("The ID of a specific moderation case you want to see.")
       );
   }
 
@@ -51,21 +58,20 @@ export default class History {
     const allactions = actionid ? getModeration(guild.id, actionid) : listUserModeration(guild.id, user.id);
     const embed = new EmbedBuilder()
       .setAuthor({ name: `•  ${user.displayName}`, iconURL: user.displayAvatarURL() })
-      .setDescription(`Moderation actions history of ${user.displayName}.`)
-      .setTitle(`Mod Action history of ${user.displayName}.`)
+      .setTitle(`Moderation cases of ${user.displayName}`)
+      //.setDescription(`Moderation actions history of ${user.displayName}.`)
       .setFields(
         allactions.length > 0
           ? allactions.map(action => {
               return {
-                name: `${actionsEmojis[action.type]} ${action.type} #${action.id}`,
+                name: `${actionsEmojis[action.type]} ${action.type} #${action.id}`, // Include durations ? needs to add a db column
                 value: [
-                  `- __Moderator__: <@${action.moderator}>`,
-                  `- __Reason__: ${action.reason}`,
-                  `- __Date__: <t:${Math.floor(action.timestamp / 1000)}:f>`
+                  `**Reason**: ${action.reason}`,
+                  `-# __Moderator:__ <@${action.moderator}> | <t:${Math.floor(action.timestamp / 1000)}:f>`
                 ].join("\n")
               };
             })
-          : [{ name: "No actions", value: "No action has been taken on this user" }]
+          : [{ name: "💨 " + nothingMsg[Math.floor(Math.random() * nothingMsg.length)], value: "No actions has been taken on this user" }]
       )
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `User ID: ${user.id}` })
