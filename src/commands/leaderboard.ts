@@ -6,19 +6,19 @@ import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
   EmbedBuilder,
-} from 'discord.js';
-import { getGuildLeaderboard } from '../utils/database/levelling';
-import { errorEmbed } from '../utils/embeds/errorEmbed';
+} from "discord.js";
+import { getGuildLeaderboard } from "../utils/database/levelling";
+import { errorEmbed } from "../utils/embeds/errorEmbed";
 
 export default class Leaderboard {
   data: SlashCommandBuilder;
 
   constructor() {
     this.data = new SlashCommandBuilder()
-      .setName('leaderboard')
-      .setDescription('Displays the guild leaderboard.')
+      .setName("leaderboard")
+      .setDescription("Displays the guild leaderboard.")
       .addNumberOption((option) =>
-        option.setName('page').setDescription('Page number to display.')
+        option.setName("page").setDescription("Page number to display.")
       );
   }
 
@@ -26,7 +26,7 @@ export default class Leaderboard {
     const guildID = interaction.guild?.id;
 
     if (!guildID) {
-      return errorEmbed(interaction, 'This command can only be used in a server.');
+      return errorEmbed(interaction, "This command can only be used in a server.");
     }
 
     const leaderboardData = getGuildLeaderboard(guildID);
@@ -34,15 +34,15 @@ export default class Leaderboard {
     if (!leaderboardData.length) {
       return errorEmbed(
         interaction,
-        'No data found.',
-        'There is no levelling data for this server yet.'
+        "No data found.",
+        "There is no levelling data for this server yet."
       );
     }
 
     leaderboardData.sort((a, b) => b.exp - a.exp);
 
     const totalPages = Math.ceil(leaderboardData.length / 5);
-    let page = interaction.options.getNumber('page') || 1;
+    let page = interaction.options.getNumber("page") || 1;
     page = Math.max(1, Math.min(page, totalPages));
 
     const generateEmbed = async () => {
@@ -52,7 +52,7 @@ export default class Leaderboard {
 
       const embed = new EmbedBuilder()
         .setTitle(`Leaderboard - Page ${page}/${totalPages}`)
-        .setColor('#0099ff');
+        .setColor("#0099ff");
 
       for (let i = 0; i < pageData.length; i++) {
         const userData = pageData[i];
@@ -68,12 +68,12 @@ export default class Leaderboard {
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId('left')
-        .setEmoji('⬅️')
+        .setCustomId("left")
+        .setEmoji("⬅️")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId('right')
-        .setEmoji('➡️')
+        .setCustomId("right")
+        .setEmoji("➡️")
         .setStyle(ButtonStyle.Primary)
     );
 
@@ -88,14 +88,14 @@ export default class Leaderboard {
         time: 60000,
       });
 
-      collector.on('collect', async (i: ButtonInteraction) => {
+      collector.on("collect", async (i: ButtonInteraction) => {
         if (i.user.id !== interaction.user.id) {
-          return errorEmbed(i, 'You are not the author of this command.');
+          return errorEmbed(i, "You are not the author of this command.");
         }
 
-        if (i.customId === 'left') {
+        if (i.customId === "left") {
           page = page > 1 ? page - 1 : totalPages;
-        } else if (i.customId === 'right') {
+        } else if (i.customId === "right") {
           page = page < totalPages ? page + 1 : 1;
         }
 
@@ -105,7 +105,7 @@ export default class Leaderboard {
         });
       });
 
-      collector.on('end', async () => {
+      collector.on("end", async () => {
         await interaction.editReply({ components: [] });
       });
     }
