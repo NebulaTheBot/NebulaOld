@@ -8,6 +8,8 @@ import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
 import { kominator } from "../utils/kominator";
 
+const cooldowns = new Map<string, number>();
+
 export default {
   name: "messageCreate",
   event: class MessageCreate {
@@ -41,9 +43,22 @@ export default {
         for (const channelID of kominator(blockedChannels))
           if (message.channelId == channelID) return;
 
-      // const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number;
+      const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number || 0;
       let expGain = getSetting(guild.id, "levelling", "set_xp_gain") as number;
       const multiplier = getSetting(guild.id, "levelling", "add_multiplier") as string;
+
+      if (cooldown > 0) {
+        const key = `${guild.id}-${author.id}`;
+        const lastExpTime = cooldowns.get(key) || 0;
+        const now = Date.now();
+
+        if (now - lastExpTime < cooldown * 1000) {
+          return;
+        } else {
+          cooldowns.set(key, now);
+        }
+      }
+
       if (multiplier) {
         const expMultiplier = kominator(multiplier);
 
