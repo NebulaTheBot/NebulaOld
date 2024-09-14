@@ -39,7 +39,13 @@ export default class Leaderboard {
       );
     }
 
-    leaderboardData.sort((a, b) => b.exp - a.exp);
+    leaderboardData.sort((a, b) => {
+      if (b.level !== a.level) {
+        return b.level - a.level;
+      } else {
+        return b.exp - a.exp;
+      }
+    });
 
     const totalPages = Math.ceil(leaderboardData.length / 5);
     let page = interaction.options.getNumber("page") || 1;
@@ -59,7 +65,7 @@ export default class Leaderboard {
         const user = await interaction.client.users.fetch(userData.user);
         embed.addFields({
           name: `${start + i + 1}. ${user.tag}`,
-          value: `Level: ${userData.level} | EXP: ${userData.exp}`,
+          value: `Level: ${Math.floor(userData.level)} | EXP: ${Math.floor(userData.exp)}`,
         });
       }
 
