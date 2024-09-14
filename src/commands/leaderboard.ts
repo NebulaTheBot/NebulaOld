@@ -40,12 +40,8 @@ export default class Leaderboard {
     }
 
     leaderboardData.sort((a, b) => {
-      if (b.level !== a.level) {
-        return b.level - a.level;
-      } else {
-        return b.exp - a.exp;
-      }
-    });
+      if (b.level != a.level) return b.level - a.level;
+      else return b.exp - a.exp;
 
     const totalPages = Math.ceil(leaderboardData.length / 5);
     let page = interaction.options.getNumber("page") || 1;
