@@ -79,3 +79,11 @@ const getExpiredBansQuery = database.query(
 export function getExpiredBans(currentTime: number) {
   return getExpiredBansQuery.all(currentTime) as TypeOfDefinition<typeof definition>[];
 }
+
+const getPendingBansQuery = database.query(
+  "SELECT * FROM moderation WHERE type = 'BAN' AND expiresAt IS NOT NULL AND expiresAt > $1;"
+);
+
+export function getPendingBans(currentTime: number) {
+  return getPendingBansQuery.all(currentTime) as TypeOfDefinition<typeof definition>[];
+}
