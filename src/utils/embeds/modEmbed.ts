@@ -108,7 +108,11 @@ export async function modEmbed(options: Options, reason?: string | null, date?: 
     .setColor(genColor(100));
 
   await logChannel(guild, embed);
-  await interaction.reply({ embeds: [embed] });
+  if (!interaction.deferred && !interaction.replied) {  // fixes any interaction has been sent or deferred error.
+    await interaction.reply({ embeds: [embed] });
+  } else {
+    await interaction.followUp({ embeds: [embed] });
+  }
 
   const dmChannel = await user.createDM().catch(() => null);
   if (!dmChannel) return;
