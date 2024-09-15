@@ -37,7 +37,7 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Founder**: Goos",
-            "**Developers**: Dimkauzh, Froxcey, Golem64, MQuery, Nikkerudon, Spectrum, ThatBOI",
+            "**Developers**: Dimkauzh, Froxcey, Golem64, MQuery, Nikkerudon, Spectrum, ThatBOI, Koslz",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI, Trynera",
             "**Testers**: Blaze, fishy, flojo, Tech, Trynera",
