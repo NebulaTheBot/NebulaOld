@@ -31,13 +31,17 @@ export default class Ban {
     const duration = interaction.options.getString("duration");
     const reason = interaction.options.getString("reason");
 
+    let expiresAt: number | undefined;
+
     if (duration) {
-      if (!ms(duration))
+      const durationMs = ms(duration);
+      if (!durationMs)
         return await errorEmbed(
           interaction,
           `You can't ban ${user.displayName} temporarily.`,
           "The duration is invalid."
         );
+        expiresAt = Date.now() + durationMs;
 
       setTimeout(async () => {
         await guild.members
@@ -69,7 +73,9 @@ export default class Ban {
             user.id,
             "BAN",
             guild.members.cache.get(interaction.user.id)?.id!,
-            reason ?? undefined
+            reason ?? undefined,
+            false,
+            expiresAt ?? null
           );
         } catch (error) {
           console.error(error);
