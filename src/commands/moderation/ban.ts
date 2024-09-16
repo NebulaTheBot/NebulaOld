@@ -7,6 +7,7 @@ import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import ms from "ms";
 import { addModeration } from "../../utils/database/moderation";
+import { scheduleUnban } from "../../utils/unbanScheduler";
 
 export default class Ban {
   data: SlashCommandSubcommandBuilder;
@@ -31,52 +32,57 @@ export default class Ban {
     const duration = interaction.options.getString("duration");
     const reason = interaction.options.getString("reason");
 
-    if (duration) {
-      if (!ms(duration))
-        return await errorEmbed(
-          interaction,
-          `You can't ban ${user.displayName} temporarily.`,
-          "The duration is invalid."
-        );
+    let expiresAt: number | null = null;
 
-      setTimeout(async () => {
-        await guild.members
-          .unban(user.id, reason ?? undefined)
-          .catch(error => console.error(error));
-
-        await modEmbed({ interaction, user, action: "Unbanned" }, reason);
-      }, ms(duration));
-    }
-
-    if (await errorCheck(
+    const error = await errorCheck(
       PermissionsBitField.Flags.BanMembers,
       { interaction, user, action: "Ban" },
       { allErrors: true, botError: true, ownerError: true, outsideError: false },
       "Ban Members"
-    ) == null) {
-      const dmChannel = await guild.members.cache.get(user.id)?.createDM().catch(() => null);
-      if (dmChannel && !user.bot) {
-        await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+    );
+    
+    if (error) return; 
+
+    if (duration) {
+      const durationMs = ms(duration);
+      if (!durationMs) {
+        return await errorEmbed(
+          interaction,
+          `You can't ban ${user.username} temporarily.`,
+          "The duration is invalid."
+        );
       }
 
-      await interaction.guild?.bans
-        .create(user.id, { reason: reason ?? undefined })
-        .catch(error => console.error(error));
-  
-        try {
-          addModeration(
-            guild.id,
-            user.id,
-            "BAN",
-            guild.members.cache.get(interaction.user.id)?.id!,
-            reason ?? undefined
-          );
-        } catch (error) {
-          console.error(error);
-        }
-      
-      if (!dmChannel || user.bot)
-        await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+      expiresAt = Date.now() + durationMs;
+      scheduleUnban(interaction.client, guild.id, user.id, durationMs);
+    }
+
+    try {
+      await guild.members.ban(user.id, { reason: reason ?? undefined });
+    } catch (err) {
+      console.error("Failed to ban user:", err);
+      return await errorEmbed(interaction, "Ban failed", "An error occurred while banning the user.");
+    }
+
+    try {
+      addModeration(
+        guild.id,
+        user.id,
+        "BAN",
+        interaction.user.id,
+        reason ?? "",
+        false,
+        expiresAt
+      );
+    } catch (err) {
+      console.error("Failed to log moderation record:", err);
+    }
+
+    const dmChannel = await guild.members.cache.get(user.id)?.createDM().catch(() => null);
+    if (dmChannel && !user.bot) {
+      await modEmbed({ interaction, user, action: "Banned", duration }, reason);
+    } else {
+      await modEmbed({ interaction, user, action: "Banned", duration }, reason);
     }
   }
 }

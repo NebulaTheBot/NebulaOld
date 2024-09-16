@@ -11,14 +11,15 @@ const definition = {
     reason: "TEXT",
     public: "BOOL",
     id: "TEXT",
-    timestamp: "TIMESTAMP"
+    timestamp: "TIMESTAMP",
+    expiresAt: "TIMESTAMP"
   }
 } satisfies TableDefinition;
 
 type modType = "MUTE" | "WARN" | "KICK" | "BAN";
 const database = getDatabase(definition);
 const addQuery = database.query(
-  "INSERT INTO moderation (guild, user, type, moderator, reason, public, id, timestamp) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);"
+  "INSERT INTO moderation (guild, user, type, moderator, reason, public, id, timestamp, expiresAt) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);"
 );
 const listUserQuery = database.query(
   "SELECT * FROM moderation WHERE guild = $1 AND user = $2;"
@@ -40,10 +41,11 @@ export function addModeration(
   type: modType,
   moderator: string,
   reason = "",
-  pub = false
+  pub = false,
+  expiresAt?: number | null
 ) {
   const id = crypto.randomUUID();
-  addQuery.run(guildID, userID, type, moderator, reason, pub, id, Date.now());
+  addQuery.run(guildID, userID, type, moderator, reason, pub, id, Date.now(), expiresAt ?? null);
   return id;
 }
 
@@ -68,4 +70,20 @@ export function listModeratorLog(guildID: number | string, moderator: number | s
 
 export function removeModeration(guildID: string | number, id: string) {
   removeQuery.run(guildID, id);
+}
+
+const getExpiredBansQuery = database.query(
+  "SELECT * FROM moderation WHERE type = 'BAN' AND expiresAt IS NOT NULL AND expiresAt <= $1;"
+);
+
+export function getExpiredBans(currentTime: number) {
+  return getExpiredBansQuery.all(currentTime) as TypeOfDefinition<typeof definition>[];
+}
+
+const getPendingBansQuery = database.query(
+  "SELECT * FROM moderation WHERE type = 'BAN' AND expiresAt IS NOT NULL AND expiresAt > $1;"
+);
+
+export function getPendingBans(currentTime: number) {
+  return getPendingBansQuery.all(currentTime) as TypeOfDefinition<typeof definition>[];
 }
