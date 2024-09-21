@@ -1,6 +1,7 @@
-import { EmbedBuilder, type ChatInputCommandInteraction, type User } from "discord.js";
+import { EmbedBuilder, inlineCode, type ChatInputCommandInteraction, type User } from "discord.js";
 import ms from "ms";
 import { genColor } from "../colorGen";
+import { addModeration, type modType } from "../database/moderation";
 import { logChannel } from "../logChannel";
 import { errorEmbed } from "./errorEmbed";
 
@@ -9,13 +10,16 @@ type Options = {
   user: User;
   action: string;
   duration?: string | null;
+  dm?: boolean;
+  dbAction?: modType;
+  expiresAt?: number;
 };
 
 type ErrorOptions = {
   allErrors: boolean;
   botError: boolean;
-  ownerError: boolean;
-  outsideError: boolean;
+  ownerError?: boolean;
+  outsideError?: boolean;
 };
 
 export async function errorCheck(
@@ -80,7 +84,12 @@ export async function errorCheck(
   }
 
   if (outsideError) {
-    if (!await guild.members.fetch(user.id).then(() => true).catch(() => false))
+    if (
+      !(await guild.members
+        .fetch(user.id)
+        .then(() => true)
+        .catch(() => false))
+    )
       return await errorEmbed(
         interaction,
         `You can't ${action.toLowerCase()} ${name}.`,
@@ -89,41 +98,58 @@ export async function errorCheck(
   }
 }
 
-export async function modEmbed(options: Options, reason?: string | null, date?: boolean, showModerator: boolean = false) {
-  const { interaction, user, action, duration } = options;
+export async function modEmbed(
+  options: Options,
+  reason?: string | null,
+  showModerator: boolean = false
+) {
+  const { interaction, user, action, duration, dm, dbAction, expiresAt } = options;
   const guild = interaction.guild!;
   const name = user.displayName;
+  const generalValues = [`Responsible moderator is ${interaction.user.displayName}`];
+  reason
+    ? generalValues.push(`The **reason** is ${inlineCode(reason)}`)
+    : generalValues.push("*No reason provided*");
 
-  const generalValues = [`**Moderator**: <@${interaction.user.id}>`];
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
-  if (reason) generalValues.push(`**Reason**: ${reason}`);
-  if (date) generalValues.push(`**Date**: <t:${Math.floor(Date.now() / 1000)}:f>`);
+  const footer = [`User ID: ${user.id}`];
+  if (dbAction) {
+    try {
+      const id = addModeration(
+        guild.id,
+        user.id,
+        dbAction,
+        guild.members.cache.get(interaction.user.id)?.id!,
+        reason ?? undefined,
+        expiresAt ?? undefined
+      );
+      footer.push(`Case ID: ${id}`);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-    .setTitle(`${action} ${name}.`)
+    .setAuthor({ name: `•  ${action} ${name}`, iconURL: user.displayAvatarURL() })
     .setDescription(generalValues.join("\n"))
-    .setThumbnail(user.displayAvatarURL())
-    .setFooter({ text: `User ID: ${user.id}` })
+    .setFooter({ text: footer.join("\n") })
     .setColor(genColor(100));
 
   await logChannel(guild, embed);
-  if (!interaction.deferred && !interaction.replied) {  // fixes any interaction has been sent or deferred error.
-    await interaction.reply({ embeds: [embed] });
-  } else {
-    await interaction.followUp({ embeds: [embed] });
-  }
+  if (interaction.replied) await interaction.followUp({ embeds: [embed] });
+  else await interaction.reply({ embeds: [embed] });
 
+  if (!dm) return;
   const dmChannel = await user.createDM().catch(() => null);
-  if (!dmChannel) return;
-  if (!guild.members.cache.get(user.id)) return;
-  if (user.bot) return;
+  if (!dmChannel || !guild.members.cache.get(user.id) || user.bot) return;
   await dmChannel
     .send({
       embeds: [
-        embed.setTitle(`You got ${action.toLowerCase()}.`)
-        .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
-        .setColor(genColor(0))]
+        embed
+          .setTitle(`You got ${action.toLowerCase()}.`)
+          .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
+          .setColor(genColor(0))
+      ]
     })
     .catch(() => null);
 }

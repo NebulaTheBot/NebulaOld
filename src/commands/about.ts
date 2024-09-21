@@ -40,7 +40,7 @@ export default class About {
             "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
             "**Designers**: ArtyH, Optix, proJM, Slider_on_the_black",
             "**Translators**: Dimkauzh, Golem64, Optix, SaFire, ThatBOI, Trynera",
-            "**Testers**: Blaze, fishy, flojo, Tech, Trynera",
+            "**Testers**: Blaze, fishy, flojo, Trynera",
             "And **YOU**, for using Sokora."
           ].join("\n")
         },

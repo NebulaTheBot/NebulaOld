@@ -90,13 +90,13 @@ export const settingsDefinition: Record<
     channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." },
     join_dm: {
       type: "BOOL",
-      desc: "Whether to send a custom DM message to the user upon joinning",
+      desc: "Whether or not the bot should send a custom DM message to the user upon joining.",
       val: false
     },
     dm_text: {
       type: "TEXT",
-      desc: "Text sent in the user's dm when they join the server. Same replacements as leave_text."
-    } // dm_text is already join_text by default if nothing is supplied, see guildMemberAdd.ts
+      desc: "Text sent in the user's DM when they join the server. Same syntax as join_text."
+    }
   }
 };
 
@@ -119,9 +119,15 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
   let res = getQuery.all(JSON.stringify(guildID), key + "." + setting) as TypeOfDefinition<
     typeof tableDefinition
   >[];
+  const set = settingsDefinition[key][setting];
 
   if (!res.length) return null;
-  switch (settingsDefinition[key][setting].type) {
+  if (res[0].value == "") {
+    if (set.type == "LIST") return null;
+    return set.val;
+  }
+
+  switch (set.type) {
     case "TEXT":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
@@ -129,7 +135,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     case "INTEGER":
       return parseInt(res[0].value) as TypeOfKey<K>;
     case "LIST":
-      return kominator(res[0].value) as TypeOfKey<K>;
+      return kominator(res[0].value);
     default:
       return "WIP" as TypeOfKey<K>;
   }

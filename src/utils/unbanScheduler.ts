@@ -1,17 +1,13 @@
 import { Client } from "discord.js";
 import { removeModeration, getPendingBans } from "./database/moderation";
 
-const scheduledUnbans = new Map<string, NodeJS.Timeout>();
-
 export function scheduleUnban(client: Client, guildId: string, userId: string, delay: number) {
+  const scheduledUnbans = new Map<string, Timer>();
   const key = `${guildId}-${userId}`;
-
-  if (scheduledUnbans.has(key)) {
-    clearTimeout(scheduledUnbans.get(key)!);
-  }
+  if (scheduledUnbans.has(key)) clearTimeout(scheduledUnbans.get(key)!);
 
   // 24.8 days because why not
-  const maxDelay = 2147483647; 
+  const maxDelay = 2147483647;
 
   if (delay > maxDelay) {
     const remainingDelay = delay - maxDelay;
@@ -41,22 +37,15 @@ export function rescheduleUnbans(client: Client) {
   const pendingBans = getPendingBans(now);
 
   for (const ban of pendingBans) {
-    if (!ban.expiresAt || ban.expiresAt === 0) {
-      continue;
-    }
+    if (!ban.expiresAt || ban.expiresAt == 0) continue;
 
-    if (typeof ban.expiresAt !== 'number' || isNaN(ban.expiresAt)) {
+    if (typeof ban.expiresAt !== "number" || isNaN(ban.expiresAt)) {
       console.error(`Invalid expiresAt value for ban: ${ban.expiresAt}`);
       continue;
     }
 
     const delay = ban.expiresAt - now;
-
-    if (delay > 0) {
-      scheduleUnban(client, ban.guild, ban.user, delay);
-    } else {
-      console.log(`Ban for user ${ban.user} has already expired. Removing from records.`);
-      removeModeration(ban.guild, ban.id);
-    }
+    if (delay > 0) scheduleUnban(client, ban.guild, ban.user, delay);
+    else removeModeration(ban.guild, ban.id);
   }
 }

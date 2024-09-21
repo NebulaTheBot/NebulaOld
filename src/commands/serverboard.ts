@@ -54,6 +54,7 @@ export default class Serverboard {
     );
 
     const reply = await interaction.reply({ embeds: [await getEmbed()], components: [row] });
+    if (pages == 1) return;
     reply
       .createMessageComponentCollector({ time: 60000 })
       .on("collect", async (i: ButtonInteraction) => {

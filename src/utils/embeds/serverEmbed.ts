@@ -49,7 +49,7 @@ export async function serverEmbed(options: Options) {
     })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
-    .setFooter({ text: `Server ID: ${guild.id}${pages ? ` • Page ${page}/${pages}` : ""}` })
+    .setFooter({ text: `${pages ? `Page ${page}/${pages}\n` : ""}Server ID: ${guild.id}` })
     .setThumbnail(guild.iconURL())
     .setColor((await imageColor(guild)) ?? genColor(200));
 

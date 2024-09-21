@@ -1,7 +1,6 @@
 import { EmbedBuilder, Guild, type Client, type DMChannel } from "discord.js";
 import { Commands } from "../handlers/commands";
 import { genColor } from "../utils/colorGen";
-import { getSetting, setSetting, settingsDefinition } from "../utils/database/settings";
 import { randomise } from "../utils/randomise";
 
 export default {
@@ -20,8 +19,13 @@ export default {
       let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
       if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
+      const client = guild.client;
       const embed = new EmbedBuilder()
-        .setTitle("Welcome to Sokora!")
+        .setAuthor({
+          name: client.user.username,
+          iconURL: client.user.displayAvatarURL()
+        })
+        .setTitle("Welcome!")
         .setDescription(
           [
             "Sokora is a multipurpose Discord bot that lets you manage your servers easily.",
@@ -30,16 +34,10 @@ export default {
           ].join("\n")
         )
         .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
+        .setThumbnail(client.user.displayAvatarURL())
         .setColor(genColor(200));
 
-      await new Commands(guild.client).registerCommandsForGuild(guild);
-      for (const key in settingsDefinition)
-        for (const setting in settingsDefinition[key]) {
-          if (settingsDefinition[key][setting].type != "LIST") continue;
-          if (!getSetting(guild.id, key, setting)) continue;
-          setSetting(guild.id, key, setting, settingsDefinition[key][setting].val);
-        }
-
+      await new Commands(client).registerCommandsForGuild(guild);
       if (dmChannel) await dmChannel.send({ embeds: [embed] });
     }
   }

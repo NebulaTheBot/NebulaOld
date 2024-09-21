@@ -1,14 +1,12 @@
-import { EmbedBuilder, type TextChannel, type Message } from "discord.js";
-import { pathToFileURL } from "url";
-import { join } from "path";
+import { EmbedBuilder, type Message, type TextChannel } from "discord.js";
 import { readdirSync } from "fs";
+import { join } from "path";
+import { pathToFileURL } from "url";
 import { genColor } from "../utils/colorGen";
-import { getSetting, setSetting } from "../utils/database/settings";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
+import { getSetting, setSetting } from "../utils/database/settings";
 import { kominator } from "../utils/kominator";
-
-const cooldowns = new Map<string, number>();
 
 export default {
   name: "messageCreate",
@@ -43,20 +41,18 @@ export default {
         for (const channelID of kominator(blockedChannels))
           if (message.channelId == channelID) return;
 
-      const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number || 0;
+      const cooldowns = new Map<string, number>();
+      const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number;
+      const multiplier = getSetting(guild.id, "levelling", "add_multiplier");
       let expGain = getSetting(guild.id, "levelling", "set_xp_gain") as number;
-      const multiplier = getSetting(guild.id, "levelling", "add_multiplier") as string;
 
       if (cooldown > 0) {
         const key = `${guild.id}-${author.id}`;
         const lastExpTime = cooldowns.get(key) || 0;
         const now = Date.now();
 
-        if (now - lastExpTime < cooldown * 1000) {
-          return;
-        } else {
-          cooldowns.set(key, now);
-        }
+        if (now - lastExpTime < cooldown * 1000) return;
+        else cooldowns.set(key, now);
       }
 
       if (multiplier) {

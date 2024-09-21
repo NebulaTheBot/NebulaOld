@@ -36,12 +36,15 @@ export default class Delwarn {
     const warns = listUserModeration(guild.id, user.id, "WARN");
     const newWarns = warns.filter(warn => warn.id != `${id}`);
 
-    await errorCheck(
-      PermissionsBitField.Flags.ModerateMembers,
-      { interaction, user, action: "Remove a warn" },
-      { allErrors: true, botError: false, ownerError: false, outsideError: false },
-      "Moderate Members"
-    );
+    if (
+      (await errorCheck(
+        PermissionsBitField.Flags.ModerateMembers,
+        { interaction, user, action: "Remove a warn" },
+        { allErrors: true, botError: false },
+        "Moderate Members"
+      )) !== null
+    )
+      return;
 
     if (newWarns.length == warns.length)
       return await errorEmbed(interaction, `There is no warn with the id of ${id}.`);
@@ -62,7 +65,6 @@ export default class Delwarn {
     }
 
     await interaction.reply({ embeds: [embed] });
-
     const dmChannel = (await user.createDM().catch(() => null)) as DMChannel | null;
     if (!dmChannel) return;
     if (user.bot) return;
