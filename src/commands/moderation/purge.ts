@@ -9,22 +9,22 @@ import { genColor } from "../../utils/colorGen";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { logChannel } from "../../utils/logChannel";
 
-export default class Purge {
+export default class Clear {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder()
-      .setName("purge")
-      .setDescription("Purges messages.")
+      .setName("clear")
+      .setDescription("Clears messages.")
       .addNumberOption(number =>
         number
           .setName("amount")
-          .setDescription("The amount of messages that you want to purge (maximum is 100).")
+          .setDescription("The amount of messages that you want to clear (maximum is 100).")
           .setRequired(true)
       )
       .addChannelOption(channel =>
         channel
           .setName("channel")
-          .setDescription("The channel that you want to purge.")
+          .setDescription("The channel that has the messages that you want to clear.")
           .addChannelTypes(
             ChannelType.GuildText,
             ChannelType.PublicThread,
@@ -49,18 +49,18 @@ export default class Purge {
 
     const amount = interaction.options.getNumber("amount")!;
     if (amount > 100)
-      return await errorEmbed(interaction, "You can only purge up to 100 messages at a time.");
+      return await errorEmbed(interaction, "You can only clear up to 100 messages at a time.");
 
-    if (amount < 1) return await errorEmbed(interaction, "You must purge at least 1 message.");
+    if (amount < 1) return await errorEmbed(interaction, "You must clear at least 1 message.");
 
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
     const embed = new EmbedBuilder()
-      .setTitle(`Purged ${amount} message${amount == 1 ? "" : "s"}.`)
+      .setTitle(`Cleared ${amount} message${amount == 1 ? "" : "s"}.`)
       .setDescription(
         [
-          `**Moderator**: ${interaction.user.username}`,
-          `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
+          `Moderator responsible is **${interaction.user.displayName}**`,
+          `Cleared messages of the **${channelOption ?? `<#${channel.id}>** channel`}`
         ].join("\n")
       )
       .setColor(genColor(100));

@@ -70,7 +70,7 @@ export default class Cases {
               const actionValues = [
                 `Responsible moderator is <@${action.moderator}>`,
                 action.reason
-                  ? `The **reason** is ${inlineCode(action.reason)}`
+                  ? `**Reason** provided is ${inlineCode(action.reason)}`
                   : "*No reason provided*",
                 `-# Action happened on **<t:${Math.floor(Number(action.timestamp) / 1000)}:d>**`
               ];

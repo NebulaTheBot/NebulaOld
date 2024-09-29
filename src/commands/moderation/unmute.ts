@@ -20,7 +20,6 @@ export default class Unmute {
   async run(interaction: ChatInputCommandInteraction) {
     const user = interaction.options.getUser("user")!;
     const target = interaction.guild?.members.cache.get(user.id)!;
-
     if (
       await errorCheck(
         PermissionsBitField.Flags.ModerateMembers,
@@ -39,6 +38,6 @@ export default class Unmute {
       );
 
     await target.edit({ communicationDisabledUntil: null }).catch(error => console.error(error));
-    await modEmbed({ interaction, user, action: "Unmuted" }, undefined);
+    await modEmbed({ interaction, user, action: "Unmuted" });
   }
 }

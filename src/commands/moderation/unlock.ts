@@ -43,7 +43,6 @@ export default class Unlock {
 
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
-
     if (channel.permissionsFor(guild.id)?.has("SendMessages"))
       return await errorEmbed(
         interaction,
@@ -55,8 +54,8 @@ export default class Unlock {
       .setTitle(`Unlocked a channel.`)
       .setDescription(
         [
-          `**Moderator**: ${interaction.user.username}`,
-          `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
+          `Moderator responsible is **${interaction.user.displayName}**`,
+          `Unlocked the **${channelOption ?? `<#${channel.id}>`}** channel`
         ].join("\n")
       )
       .setColor(genColor(100));

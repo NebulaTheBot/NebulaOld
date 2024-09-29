@@ -32,12 +32,12 @@ export default class Unban {
       .filter(user => user.id == id)[0]!;
 
     if (
-      (await errorCheck(
+      await errorCheck(
         PermissionsBitField.Flags.BanMembers,
         { interaction, user: target, action: "Unban" },
         { allErrors: false, botError: true, ownerError: true },
         "Ban Members"
-      )) !== null
+      )
     )
       return;
 

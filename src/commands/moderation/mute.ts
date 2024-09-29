@@ -6,7 +6,6 @@ import {
 import ms from "ms";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
-import { addModeration } from "../../utils/database/moderation";
 
 export default class Mute {
   data: SlashCommandSubcommandBuilder;
@@ -32,7 +31,6 @@ export default class Mute {
     const user = interaction.options.getUser("user")!;
     const duration = interaction.options.getString("duration")!;
     const reason = interaction.options.getString("reason");
-
     if (
       await errorCheck(
         PermissionsBitField.Flags.ModerateMembers,

@@ -13,7 +13,9 @@ const tableDefinition = {
 
 const database = getDatabase(tableDefinition);
 const getQuery = database.query("SELECT * FROM levelRewards WHERE guild = $1;");
-const addQuery = database.query("INSERT INTO levelRewards (guild, roleID, level) VALUES (?1, ?2, ?3);");
+const addQuery = database.query(
+  "INSERT INTO levelRewards (guild, roleID, level) VALUES (?1, ?2, ?3);"
+);
 const removeQuery = database.query("DELETE FROM levelRewards WHERE guild = $1 AND roleID = $2");
 
 export function get(guildID: string) {

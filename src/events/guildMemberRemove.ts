@@ -33,7 +33,6 @@ export default {
         .setTitle("Goodbye!")
         .setDescription(text ?? `**@${user.displayName}** has left the server 😥`)
         .setFooter({ text: `User ID: ${member.id}` })
-        .setThumbnail(avatarURL)
         .setColor(
           member.user.hexAccentColor ?? (await imageColor(undefined, member)) ?? genColor(200)
         );

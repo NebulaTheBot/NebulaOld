@@ -3,9 +3,9 @@ import {
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
-import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
-import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import ms from "ms";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
+import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 import { scheduleUnban } from "../../utils/unbanScheduler";
 
 export default class Ban {
@@ -28,14 +28,13 @@ export default class Ban {
     const guild = interaction.guild!;
     const duration = interaction.options.getString("duration");
     const reason = interaction.options.getString("reason");
-
     if (
-      !(await errorCheck(
+      await errorCheck(
         PermissionsBitField.Flags.BanMembers,
         { interaction, user, action: "Ban" },
         { allErrors: true, botError: true, ownerError: true },
         "Ban Members"
-      ))
+      )
     )
       return;
 
@@ -45,7 +44,7 @@ export default class Ban {
       if (!durationMs) {
         return await errorEmbed(
           interaction,
-          `You can't ban ${user.username} temporarily.`,
+          `You can't ban ${user.displayName} temporarily.`,
           "The duration is invalid."
         );
       }

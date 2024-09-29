@@ -106,9 +106,9 @@ export async function modEmbed(
   const { interaction, user, action, duration, dm, dbAction, expiresAt } = options;
   const guild = interaction.guild!;
   const name = user.displayName;
-  const generalValues = [`Responsible moderator is ${interaction.user.displayName}`];
+  const generalValues = [`Responsible moderator is **${interaction.user.displayName}**`];
   reason
-    ? generalValues.push(`The **reason** is ${inlineCode(reason)}`)
+    ? generalValues.push(`**Reason** provided is ${inlineCode(reason)}`)
     : generalValues.push("*No reason provided*");
 
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);

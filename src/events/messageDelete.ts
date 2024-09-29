@@ -21,7 +21,6 @@ export default {
           value: codeBlock(message.content)
         })
         .setFooter({ text: `Message ID: ${message.id}\nUser ID: ${message.author.id}` })
-        .setThumbnail(author.displayAvatarURL())
         .setColor(genColor(60));
 
       await logChannel(guild, embed);

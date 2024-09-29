@@ -3,6 +3,7 @@ import {
   EmbedBuilder,
   PermissionsBitField,
   SlashCommandSubcommandBuilder,
+  inlineCode,
   type ChatInputCommandInteraction
 } from "discord.js";
 import ms from "ms";
@@ -54,9 +55,9 @@ export default class Slowdown {
       );
 
     const time = interaction.options.getString("time")!;
+    const reason = interaction.options.getString("reason");
     const channelOption = interaction.options.getChannel("channel")!;
     const channel = guild.channels.cache.get(interaction.channel?.id ?? channelOption.id)!;
-
     let title = `Set a slowdown of \`${channelOption ?? `${channel.name}`}\` to ${ms(ms(time), {
       long: true
     })}.`;
@@ -66,9 +67,9 @@ export default class Slowdown {
       .setTitle(title)
       .setDescription(
         [
-          `**Moderator**: ${interaction.user.username}`,
-          `**Reason**: ${interaction.options.getString("reason") ?? "No reason provided"}`,
-          `**Channel**: ${channelOption ?? `<#${channel.id}>`}`
+          `Moderator responsible is **${interaction.user.displayName}**`,
+          reason ? `**Reason** provided is ${inlineCode(reason)}` : "*No reason provided*",
+          `${ms(time) ? "Slowed the" : "Removed the slowdown from the"} **${channelOption ?? `<#${channel.id}>** ${ms(time) ? "channel down" : "channel"}`}`
         ].join("\n")
       )
       .setColor(genColor(100));

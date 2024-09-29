@@ -7,8 +7,8 @@ const tableDefinition = {
     guild: "TEXT",
     user: "TEXT",
     level: "INTEGER",
-    exp: "INTEGER",
-  },
+    exp: "INTEGER"
+  }
 } satisfies TableDefinition;
 
 const database = getDatabase(tableDefinition);
@@ -32,8 +32,6 @@ export function setLevel(guildID: string | number, userID: string, level: number
   insertQuery.run(guildID, userID, level, exp);
 }
 
-export function getGuildLeaderboard(
-  guildID: string
-): TypeOfDefinition<typeof tableDefinition>[] {
+export function getGuildLeaderboard(guildID: string): TypeOfDefinition<typeof tableDefinition>[] {
   return getGuildQuery.all(guildID) as TypeOfDefinition<typeof tableDefinition>[];
 }
