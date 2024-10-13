@@ -1,35 +1,45 @@
-import { Client } from "discord.js";
-import { removeModeration, getPendingBans } from "./database/moderation";
+import { Client, EmbedBuilder } from "discord.js";
+import { genColor } from "./colorGen";
+import { getPendingBans, removeModeration } from "./database/moderation";
+import { logChannel } from "./logChannel";
 
-export function scheduleUnban(client: Client, guildId: string, userId: string, delay: number) {
+export async function logUnban(client: Client) {
+  const pendingBans = getPendingBans(Date.now());
+
+  const now = Date.now();
+  console.log(pendingBans);
+  console.log(getPendingBans(now));
+  for (const ban of pendingBans) {
+    console.log(ban);
+    const guild = await client.guilds.fetch(ban.guild);
+    const user = guild.members.cache.get(ban.user)!;
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: `•  Unbanned ${user.displayName}`, iconURL: user.displayAvatarURL() })
+      .setDescription([`**Moderator**: ${ban.moderator}`, "*Temporary ban has expired*"].join("\n"))
+      .setFooter({ text: `User ID: ${user.id}\nCase ID: ${ban.id}` })
+      .setColor(genColor(100));
+
+    return await logChannel(guild, embed);
+  }
+}
+
+export function scheduleUnban(client: Client, guildID: string, userID: string, delay: number) {
   const scheduledUnbans = new Map<string, Timer>();
-  const key = `${guildId}-${userId}`;
+  const key = `${guildID}-${userID}`;
   if (scheduledUnbans.has(key)) clearTimeout(scheduledUnbans.get(key)!);
 
-  // 24.8 days because why not
-  const maxDelay = 2147483647;
+  const timeout = setTimeout(async () => {
+    try {
+      await logUnban(client);
+      await (await client.guilds.fetch(guildID)).members.unban(userID, "Temporary ban has expired");
+      removeModeration(guildID, userID);
+      scheduledUnbans.delete(key);
+    } catch (error) {
+      console.error(`Failed to unban user ${userID} in guild ${guildID}:`, error);
+    }
+  }, delay);
 
-  if (delay > maxDelay) {
-    const remainingDelay = delay - maxDelay;
-    const timeout = setTimeout(() => {
-      scheduleUnban(client, guildId, userId, remainingDelay);
-    }, maxDelay);
-
-    scheduledUnbans.set(key, timeout);
-  } else {
-    const timeout = setTimeout(async () => {
-      try {
-        const guild = await client.guilds.fetch(guildId);
-        await guild.members.unban(userId, "Temporary ban expired");
-        removeModeration(guildId, userId);
-        scheduledUnbans.delete(key);
-      } catch (error) {
-        console.error(`Failed to unban user ${userId} in guild ${guildId}:`, error);
-      }
-    }, delay);
-
-    scheduledUnbans.set(key, timeout);
-  }
+  return scheduledUnbans.set(key, timeout);
 }
 
 export function rescheduleUnbans(client: Client) {
@@ -37,7 +47,7 @@ export function rescheduleUnbans(client: Client) {
   const pendingBans = getPendingBans(now);
 
   for (const ban of pendingBans) {
-    if (!ban.expiresAt || ban.expiresAt == 0) continue;
+    if (!ban.expiresAt) continue;
 
     if (typeof ban.expiresAt !== "number" || isNaN(ban.expiresAt)) {
       console.error(`Invalid expiresAt value for ban: ${ban.expiresAt}`);

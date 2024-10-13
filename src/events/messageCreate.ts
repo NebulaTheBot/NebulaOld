@@ -29,12 +29,12 @@ export default {
       // Levelling
       if (!getSetting(guild.id, "levelling", "enabled")) return;
 
-      const level = getSetting(guild.id, "levelling", "set_level") as string;
-      if (level) {
-        const newLevel = kominator(level);
-        setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
-        setSetting(guild.id, "levelling", "set_level", "");
-      }
+      // const level = getSetting(guild.id, "levelling", "set_level") as string;
+      // if (level) {
+      //   const newLevel = kominator(level);
+      //   setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
+      //   setSetting(guild.id, "levelling", "set_level", "");
+      // }
 
       const blockedChannels = getSetting(guild.id, "levelling", "block_channels") as string;
       if (blockedChannels != undefined)
@@ -43,7 +43,7 @@ export default {
 
       const cooldowns = new Map<string, number>();
       const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number;
-      const multiplier = getSetting(guild.id, "levelling", "add_multiplier");
+      // const multiplier = getSetting(guild.id, "levelling", "add_multiplier");
       let expGain = getSetting(guild.id, "levelling", "set_xp_gain") as number;
 
       if (cooldown > 0) {
@@ -55,15 +55,15 @@ export default {
         else cooldowns.set(key, now);
       }
 
-      if (multiplier) {
-        const expMultiplier = kominator(multiplier);
-
-        if (expMultiplier[1] == "channel") if (message.channelId != expMultiplier[2]) return;
-        if (expMultiplier[1] == "role")
-          if (!message.member?.roles.cache.has(expMultiplier[2])) return;
-
-        expGain = expGain * +expMultiplier[0];
-      }
+      // if (multiplier) {
+      //   const expMultiplier = kominator(multiplier as string);
+      //
+      //   if (expMultiplier[1] == "channel") if (message.channelId != expMultiplier[2]) return;
+      //   if (expMultiplier[1] == "role")
+      //     if (!message.member?.roles.cache.has(expMultiplier[2])) return;
+      //
+      //   expGain = expGain * +expMultiplier[0];
+      // }
 
       const levelChannelId = getSetting(guild.id, "levelling", "channel");
       const [guildLevel, guildExp] = getLevel(guild.id, author.id);

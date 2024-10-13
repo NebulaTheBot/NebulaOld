@@ -106,11 +106,8 @@ export async function modEmbed(
   const { interaction, user, action, duration, dm, dbAction, expiresAt } = options;
   const guild = interaction.guild!;
   const name = user.displayName;
-  const generalValues = [`Responsible moderator is **${interaction.user.displayName}**`];
-  reason
-    ? generalValues.push(`**Reason** provided is ${inlineCode(reason)}`)
-    : generalValues.push("*No reason provided*");
-
+  const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
+  reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
   const footer = [`User ID: ${user.id}`];
   if (dbAction) {
@@ -146,6 +143,7 @@ export async function modEmbed(
     .send({
       embeds: [
         embed
+          .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
           .setTitle(`You got ${action.toLowerCase()}.`)
           .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
           .setColor(genColor(0))

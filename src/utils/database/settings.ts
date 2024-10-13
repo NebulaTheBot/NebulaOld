@@ -25,16 +25,16 @@ export const settingsDefinition: Record<
       type: "TEXT",
       desc: "ID(s) of the channels where messages aren't counted, comma separated."
     },
-    set_level: { type: "TEXT", desc: "Set the level of a user." },
-    add_multiplier: {
-      type: "LIST",
-      desc: "Add an XP multiplier to the levelling system.",
-      val: {
-        multiplier: { type: "INTEGER", desc: "Set the XP multiplier for the role/channel." },
-        role_channel: { type: "TEXT", desc: "Role or channel. (choose)" },
-        id: { type: "TEXT", desc: "ID of the role/channel." }
-      }
-    },
+    // set_level: { type: "TEXT", desc: "Set the level of a user." },
+    // add_multiplier: {
+    //   type: "LIST",
+    //   desc: "Add an XP multiplier to the levelling system.",
+    //   val: {
+    //     multiplier: { type: "INTEGER", desc: "Set the XP multiplier for the role/channel." },
+    //     role_channel: { type: "TEXT", desc: "Role or channel. (choose)" },
+    //     id: { type: "TEXT", desc: "ID of the role/channel." }
+    //   }
+    // },
     set_xp_gain: {
       type: "INTEGER",
       desc: "Set the amount of XP a user gains per message.",
@@ -131,11 +131,11 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
     case "TEXT":
       return res[0].value as TypeOfKey<K>;
     case "BOOL":
-      return (res[0].value ? "true" : "false") as TypeOfKey<K>;
+      return (res[0].value === "1" ? true : false) as TypeOfKey<K>;
     case "INTEGER":
       return parseInt(res[0].value) as TypeOfKey<K>;
     case "LIST":
-      return kominator(res[0].value);
+      return kominator(res[0].value) as TypeOfKey<K>;
     default:
       return "WIP" as TypeOfKey<K>;
   }
