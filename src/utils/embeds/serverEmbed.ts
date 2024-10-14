@@ -19,6 +19,7 @@ type Options = {
  * @param options Options of the embed.
  * @returns Embed that contains the guild info.
  */
+
 export default async function serverEmbed(options: Options) {
   const db = await database();
 
