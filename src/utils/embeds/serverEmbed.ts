@@ -1,3 +1,9 @@
+/**
+ * Sends an embed containing information about the guild.
+ * @param options Options of the embed.
+ * @returns Embed that contains the guild info.
+ */
+
 import { ColorResolvable, EmbedBuilder, type Guild } from "discord.js";
 import { genColor, genRGBColor } from "../colorGen.js";
 import Vibrant from "node-vibrant";
@@ -14,11 +20,6 @@ type Options = {
   subs?: number
 };
 
-/**
- * Sends an embed containing information about the guild.
- * @param options Options of the embed.
- * @returns Embed that contains the guild info.
- */
 export default async function serverEmbed(options: Options) {
   const db = await database();
 
