@@ -1,3 +1,9 @@
+/**
+ * Sends an embed containing information about the guild.
+ * @param options Options of the embed.
+ * @returns Embed that contains the guild info.
+ */
+
 import { EmbedBuilder, type Guild } from "discord.js";
 import { genColor } from "../colorGen";
 import { imageColor } from "../imageColor";
@@ -9,11 +15,6 @@ type Options = {
   pages?: number;
 };
 
-/**
- * Sends an embed containing information about the guild.
- * @param options Options of the embed.
- * @returns Embed that contains the guild info.
- */
 export async function serverEmbed(options: Options) {
   const { page, pages, guild } = options;
   const { premiumTier: boostTier, premiumSubscriptionCount: boostCount } = guild;

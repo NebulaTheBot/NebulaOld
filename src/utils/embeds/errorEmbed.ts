@@ -8,6 +8,7 @@ import { genColor } from "../colorGen";
  * @param reason The reason of the error.
  * @returns Embed with the error description.
  */
+
 export async function errorEmbed(
   interaction: ChatInputCommandInteraction | ButtonInteraction,
   title: string,
