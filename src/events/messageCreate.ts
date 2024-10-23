@@ -5,7 +5,7 @@ import { pathToFileURL } from "url";
 import { genColor } from "../utils/colorGen";
 import { getLevel, setLevel } from "../utils/database/levelling";
 import { get as getLevelRewards } from "../utils/database/levelRewards";
-import { getSetting, setSetting } from "../utils/database/settings";
+import { getSetting } from "../utils/database/settings";
 import { kominator } from "../utils/kominator";
 
 export default {
@@ -43,6 +43,7 @@ export default {
 
       const cooldowns = new Map<string, number>();
       const cooldown = getSetting(guild.id, "levelling", "set_cooldown") as number;
+      console.log(cooldown);
       // const multiplier = getSetting(guild.id, "levelling", "add_multiplier");
       let expGain = getSetting(guild.id, "levelling", "set_xp_gain") as number;
 
@@ -54,6 +55,7 @@ export default {
         if (now - lastExpTime < cooldown * 1000) return;
         else cooldowns.set(key, now);
       }
+      console.log(cooldowns);
 
       // if (multiplier) {
       //   const expMultiplier = kominator(multiplier as string);

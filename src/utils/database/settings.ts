@@ -121,8 +121,7 @@ export function getSetting<K extends keyof typeof settingsDefinition>(
   >[];
   const set = settingsDefinition[key][setting];
 
-  if (!res.length) return null;
-  if (res[0].value == "") {
+  if (!res.length) {
     if (set.type == "LIST") return null;
     return set.val;
   }

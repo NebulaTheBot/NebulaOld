@@ -5,7 +5,6 @@ import {
   PermissionsBitField,
   SlashCommandBuilder,
   SlashCommandSubcommandBuilder,
-  SlashCommandSubcommandGroupBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../utils/colorGen";

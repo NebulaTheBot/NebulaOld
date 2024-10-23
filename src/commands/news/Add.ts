@@ -9,11 +9,11 @@ import {
   type ChatInputCommandInteraction
 } from "discord.js";
 import { genColor } from "../../utils/colorGen";
-import { addNews } from "../../utils/database/news";
+import { addNews, listAllQuery } from "../../utils/database/news";
 import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { sendChannelNews } from "../../utils/sendChannelNews";
 
-export default class Send {
+export default class Add {
   data: SlashCommandSubcommandBuilder;
   constructor() {
     this.data = new SlashCommandSubcommandBuilder().setName("add").setDescription("Add your news.");
@@ -61,7 +61,7 @@ export default class Send {
     interaction.client.once("interactionCreate", async i => {
       if (!i.isModalSubmit()) return;
 
-      const id = crypto.randomUUID();
+      const id = (listAllQuery.all(guild.id).length + 1).toString();
       addNews(
         guild.id,
         i.fields.getTextInputValue("title"),

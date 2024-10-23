@@ -61,31 +61,31 @@ export default class View {
     );
 
     const reply = await interaction.reply({ embeds: [getEmbed()], components: [row] });
-    reply
-      .createMessageComponentCollector({ time: 60000 })
-      .on("collect", async (i: ButtonInteraction) => {
-        if (i.message.id != (await reply.fetch()).id)
-          return await errorEmbed(
-            i,
-            "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
-          );
+    const collector = reply.createMessageComponentCollector({ time: 60000 });
+    collector.on("collect", async (i: ButtonInteraction) => {
+      if (i.message.id != (await reply.fetch()).id)
+        return await errorEmbed(
+          i,
+          "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
+        );
 
-        if (i.user.id != interaction.user.id)
-          return await errorEmbed(i, "You aren't the person who executed this command.");
+      if (i.user.id != interaction.user.id)
+        return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await i.editReply({ components: [] }), 60000);
-        switch (i.customId) {
-          case "left":
-            page--;
-            if (page < 1) page = sortedNews.length;
-            await i.update({ embeds: [getEmbed()], components: [row] });
-            break;
-          case "right":
-            page++;
-            if (page > sortedNews.length) page = 1;
-            await i.update({ embeds: [getEmbed()], components: [row] });
-            break;
-        }
-      });
+      switch (i.customId) {
+        case "left":
+          page--;
+          if (page < 1) page = sortedNews.length;
+          await i.update({ embeds: [getEmbed()], components: [row] });
+          break;
+        case "right":
+          page++;
+          if (page > sortedNews.length) page = 1;
+          await i.update({ embeds: [getEmbed()], components: [row] });
+          break;
+      }
+    });
+
+    collector.on("end", async () => await interaction.editReply({ components: [] }));
   }
 }

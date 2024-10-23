@@ -45,7 +45,7 @@ export default class Serverboard {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("left")
-        .setEmoji("1271045078042935398")
+        .setEmoji("1137330341472915526")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId("right")

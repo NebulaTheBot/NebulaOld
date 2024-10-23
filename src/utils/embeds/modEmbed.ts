@@ -107,9 +107,9 @@ export async function modEmbed(
   const guild = interaction.guild!;
   const name = user.displayName;
   const generalValues = [`**Moderator**: ${interaction.user.displayName}`];
+  let author = `•  ${action} ${name}`;
   reason ? generalValues.push(`**Reason**: ${reason}`) : generalValues.push("*No reason provided*");
   if (duration) generalValues.push(`**Duration**: ${ms(ms(duration), { long: true })}`);
-  const footer = [`User ID: ${user.id}`];
   if (dbAction) {
     try {
       const id = addModeration(
@@ -120,16 +120,16 @@ export async function modEmbed(
         reason ?? undefined,
         expiresAt ?? undefined
       );
-      footer.push(`Case ID: ${id}`);
+      author = author.concat(`  •  #${id}`);
     } catch (error) {
       console.error(error);
     }
   }
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${action} ${name}`, iconURL: user.displayAvatarURL() })
+    .setAuthor({ name: author, iconURL: user.displayAvatarURL() })
     .setDescription(generalValues.join("\n"))
-    .setFooter({ text: footer.join("\n") })
+    .setFooter({ text: `User ID: ${user.id}` })
     .setColor(genColor(100));
 
   await logChannel(guild, embed);

@@ -1,4 +1,4 @@
-import type { ColorResolvable, Guild, GuildMember } from "discord.js";
+import type { ColorResolvable, Guild, GuildMember, User } from "discord.js";
 import Vibrant from "node-vibrant";
 import sharp from "sharp";
 import { genRGBColor } from "./colorGen";
@@ -9,7 +9,8 @@ import { genRGBColor } from "./colorGen";
  * @param member Member image.
  * @returns The color in HEX.
  */
-export async function imageColor(guild?: Guild, member?: GuildMember) {
+
+export async function imageColor(guild?: Guild, member?: GuildMember | User) {
   const guildURL = guild?.iconURL();
   const memberURL = member?.displayAvatarURL();
   if (!guildURL || !memberURL) return;

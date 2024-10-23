@@ -20,7 +20,7 @@ const database = getDatabase(definition);
 const sendQuery = database.query(
   "INSERT INTO news (guildID, title, body, author, authorPFP, createdAt, updatedAt, messageID, id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);"
 );
-const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
+export const listAllQuery = database.query("SELECT * FROM news WHERE guildID = $1;");
 const getIdQuery = database.query("SELECT * FROM news WHERE id = $1;");
 const deleteQuery = database.query("DELETE FROM news WHERE id = $1");
 

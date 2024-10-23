@@ -15,7 +15,9 @@ export default class Cases {
     this.data = new SlashCommandSubcommandBuilder()
       .setName("cases")
       .setDescription("Moderation cases in a server.")
-      .addUserOption(user => user.setName("user").setDescription("The user that you want to see."))
+      .addUserOption(user =>
+        user.setName("user").setDescription("The user that you want to see.").setRequired(true)
+      )
       .addStringOption(string =>
         string.setName("id").setDescription("The ID of a specific moderation case you want to see.")
       );

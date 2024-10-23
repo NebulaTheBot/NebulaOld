@@ -1,5 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { genColor } from "../utils/colorGen";
+import { imageColor } from "../utils/imageColor";
 import { randomise } from "../utils/randomise";
 
 export default class About {
@@ -12,6 +13,7 @@ export default class About {
 
   async run(interaction: ChatInputCommandInteraction) {
     const client = interaction.client;
+    const user = client.user;
     const guilds = client.guilds.cache;
     const members = guilds.map(guild => guild.memberCount).reduce((a, b) => a + b);
     const shards = client.shard?.count;
@@ -19,7 +21,7 @@ export default class About {
     if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: "•  About Sokora", iconURL: client.user.displayAvatarURL() })
+      .setAuthor({ name: "•  About Sokora", iconURL: user.displayAvatarURL() })
       .setDescription(
         "Sokora is a multipurpose Discord bot that lets you manage your servers easily."
       )
@@ -51,8 +53,8 @@ export default class About {
         }
       )
       .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
-      .setThumbnail(client.user.displayAvatarURL())
-      .setColor(genColor(270));
+      .setThumbnail(user.displayAvatarURL())
+      .setColor(user.hexAccentColor ?? (await imageColor(undefined, user)) ?? genColor(270));
 
     await interaction.reply({ embeds: [embed] });
   }

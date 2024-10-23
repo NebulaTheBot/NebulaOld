@@ -99,8 +99,6 @@ export default class User {
       components: enabled ? [row] : []
     });
 
-    console.log(enabled);
-    console.log(!enabled);
     if (!enabled && user.bot) return;
     const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
     const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
@@ -137,7 +135,7 @@ export default class User {
             name: `⚡ • Guild level ${guildLevel ?? 0}`,
             value: [
               `**${guildExp.toLocaleString("en-US") ?? 0}/${nextLevelExp}** EXP`,
-              `**Next level**: ${(guildLevel ?? 0) + 1}`
+              `The next level is **${(guildLevel ?? 0) + 1}**`
             ].join("\n"),
             inline: true
           },
@@ -145,7 +143,7 @@ export default class User {
             name: `⛈️ • Global level ${globalLevel ?? 0}`,
             value: [
               `**${globalExp.toLocaleString("en-US") ?? 0}/${globalNextLevelExp}** EXP`,
-              `**Next level**: ${(globalLevel ?? 0) + 1}`
+              `The next level is **${(globalLevel ?? 0) + 1}**`
             ].join("\n"),
             inline: true
           }

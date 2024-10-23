@@ -8,6 +8,7 @@ import {
   type ChatInputCommandInteraction,
   type SlashCommandOptionsOnlyBuilder
 } from "discord.js";
+import { genColor } from "../utils/colorGen";
 import { getGuildLeaderboard } from "../utils/database/levelling";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 
@@ -46,15 +47,16 @@ export default class Leaderboard {
       const pageData = leaderboardData.slice(start, end);
 
       const embed = new EmbedBuilder()
-        .setTitle(`Leaderboard - Page ${page}/${totalPages}`)
-        .setColor("#0099ff");
+        .setAuthor({ name: "•  Leaderboard" })
+        .setColor(genColor(200))
+        .setFooter({ text: `Page ${page}/${totalPages}` });
 
       for (let i = 0; i < pageData.length; i++) {
         const userData = pageData[i];
         const user = await interaction.client.users.fetch(userData.user);
         embed.addFields({
           name: `${start + i + 1}. ${user.tag}`,
-          value: `Level: ${Math.floor(userData.level)} | EXP: ${Math.floor(userData.exp)}`
+          value: `**Level**: ${Math.floor(userData.level)} • **EXP**: ${Math.floor(userData.exp)}`
         });
       }
 

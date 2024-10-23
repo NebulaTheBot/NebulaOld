@@ -2,19 +2,20 @@ import { file } from "bun";
 import type { AutocompleteInteraction, Client, CommandInteraction } from "discord.js";
 import { join } from "path";
 import { pathToFileURL } from "url";
+import { capitalize } from "../utils/capitalize";
 
 async function getCommand(
   interaction: CommandInteraction | AutocompleteInteraction,
   options: any
 ): Promise<any> {
-  const commandName = interaction.commandName;
-  const subcommandName = options.getSubcommand(false);
-  const commandGroupName = options.getSubcommandGroup(false);
+  const commandName = capitalize(interaction.commandName)!;
+  const subcommandName = capitalize(options.getSubcommand(false));
+  const commandGroupName = capitalize(options.getSubcommandGroup(false));
   let commandImportPath = join(
     join(process.cwd(), "src", "commands"),
     `${
       subcommandName
-        ? `${commandName}/${
+        ? `${commandName.toLowerCase()}/${
             commandGroupName ? `${commandGroupName}/${subcommandName}` : subcommandName
           }`
         : commandName
