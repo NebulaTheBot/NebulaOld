@@ -47,7 +47,7 @@ export default class Leaderboard {
       const pageData = leaderboardData.slice(start, end);
 
       const embed = new EmbedBuilder()
-        .setAuthor({ name: "•  Leaderboard" })
+        .setAuthor({ name: "Leaderboard" })
         .setColor(genColor(200))
         .setFooter({ text: `Page ${page}/${totalPages}` });
 
@@ -55,8 +55,8 @@ export default class Leaderboard {
         const userData = pageData[i];
         const user = await interaction.client.users.fetch(userData.user);
         embed.addFields({
-          name: `${start + i + 1}. ${user.tag}`,
-          value: `**Level**: ${Math.floor(userData.level)} • **EXP**: ${Math.floor(userData.exp)}`
+          name: `#${start + i + 1} • ${user.tag}`,
+          value: `Level **${Math.floor(userData.level)}** • **${Math.floor(userData.exp)}** EXP`
         });
       }
 
@@ -64,8 +64,14 @@ export default class Leaderboard {
     };
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("left").setEmoji("⬅️").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("right").setEmoji("➡️").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder()
+        .setCustomId("left")
+        .setEmoji("1298708251256291379")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("right")
+        .setEmoji("1298708281493160029")
+        .setStyle(ButtonStyle.Primary)
     );
 
     const reply = await interaction.reply({

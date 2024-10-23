@@ -52,11 +52,11 @@ export default class View {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("left")
-        .setEmoji("1271045078042935398")
+        .setEmoji("1298708251256291379")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId("right")
-        .setEmoji("1271045041313415370")
+        .setEmoji("1298708281493160029")
         .setStyle(ButtonStyle.Primary)
     );
 
