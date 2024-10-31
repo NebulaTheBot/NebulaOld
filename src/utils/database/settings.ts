@@ -35,15 +35,20 @@ export const settingsDefinition: Record<
     //     id: { type: "TEXT", desc: "ID of the role/channel." }
     //   }
     // },
-    set_xp_gain: {
+    xp_gain: {
       type: "INTEGER",
       desc: "Set the amount of XP a user gains per message.",
       val: 2
     },
-    set_cooldown: {
+    cooldown: {
       type: "INTEGER",
       desc: "Set the cooldown between messages that add XP.",
       val: 2
+    },
+    difficulty: {
+      type: "INTEGER",
+      desc: "Set the difficulty (ex: 2 will make it 2x harder to level up).",
+      val: 1.25
     }
   },
   moderation: {
@@ -79,13 +84,13 @@ export const settingsDefinition: Record<
   welcome: {
     join_text: {
       type: "TEXT",
-      desc: "Text sent when a user joins. (user) - username, (count) - member count, (servername) - server name.",
-      val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Enjoy, and have a nice day!"
+      desc: "Text sent when a user joins. (name) - username, (count) - member count, (servername) - server name.",
+      val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!"
     },
     leave_text: {
       type: "TEXT",
-      desc: "Text sent when a user leaves. (user) - username, (count) - member count, (servername) - server name.",
-      val: "(name) has left the server 😥"
+      desc: "Text sent when a user leaves. (name) - username, (count) - member count, (servername) - server name.",
+      val: "(name) has left the server! 😥"
     },
     channel: { type: "TEXT", desc: "ID of the channel where welcome messages are sent." },
     join_dm: {
@@ -95,7 +100,8 @@ export const settingsDefinition: Record<
     },
     dm_text: {
       type: "TEXT",
-      desc: "Text sent in the user's DM when they join the server. Same syntax as join_text."
+      desc: "Text sent in the user's DM when they join the server. Same syntax as join_text.",
+      val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!"
     }
   }
 };

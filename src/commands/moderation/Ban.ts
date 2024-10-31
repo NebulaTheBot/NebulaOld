@@ -49,7 +49,7 @@ export default class Ban {
         );
 
       expiresAt = Date.now() + durationMs;
-      scheduleUnban(interaction.client, guild.id, user.id, durationMs);
+      scheduleUnban(interaction.client, guild.id, user.id, interaction.member!.user.id, durationMs);
     }
 
     try {

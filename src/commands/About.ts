@@ -1,4 +1,11 @@
-import { EmbedBuilder, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  EmbedBuilder,
+  SlashCommandBuilder,
+  type ChatInputCommandInteraction
+} from "discord.js";
 import { genColor } from "../utils/colorGen";
 import { imageColor } from "../utils/imageColor";
 import { randomise } from "../utils/randomise";
@@ -29,7 +36,7 @@ export default class About {
         {
           name: "📃 • General",
           value: [
-            "**Version** 0.1-preview, *Kaishi*",
+            "Version **0.1**, *Kaishi*",
             `**${members}** members • **${guilds.size}** guild${guilds.size == 1 ? "" : "s"} ${
               !shards ? "" : `• **${shards}** shard${shards == 1 ? "" : "s"}`
             }`
@@ -39,10 +46,11 @@ export default class About {
           name: "🌌 • Entities involved",
           value: [
             "**Founder**: Goos",
+            "**Translator Lead**: ThatBOI",
             "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
-            "**Designers**: ArtyH, Optix, proJM",
-            "**Translators**: Dimkauzh, flojo, Golem64, Optix, SaFire, ThatBOI",
-            "**Testers**: Blaze, fishy, flojo, Trynera",
+            "**Designers**: ArtyH, Optix, Pjanda",
+            "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, Optix, SaFire, TrulyBlue",
+            "**Testers**: Blaze, fishy, Trynera",
             "And **YOU**, for using Sokora."
           ].join("\n")
         },
@@ -56,6 +64,14 @@ export default class About {
       .setThumbnail(user.displayAvatarURL())
       .setColor(user.hexAccentColor ?? (await imageColor(undefined, user)) ?? genColor(270));
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel("•  Donate")
+        .setURL("https://paypal.me/SokoraTheBot")
+        .setEmoji("⭐")
+        .setStyle(ButtonStyle.Link)
+    );
+
+    await interaction.reply({ embeds: [embed], components: [row] });
   }
 }

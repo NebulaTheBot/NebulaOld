@@ -9,7 +9,7 @@ import {
   type SlashCommandOptionsOnlyBuilder
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
-import { getLevel, setLevel } from "../utils/database/levelling";
+import { getLevel } from "../utils/database/levelling";
 import { getSetting } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { imageColor } from "../utils/imageColor";
@@ -96,20 +96,17 @@ export default class User {
     row.components[0].setDisabled(true);
     const reply = await interaction.reply({
       embeds: [embed],
-      components: enabled ? [row] : []
+      components: !user.bot ? (enabled ? [row] : []) : []
     });
 
     if (!enabled && user.bot) return;
-    const [guildLevel, guildExp] = getLevel(`${guild.id}`, `${target.id}`)!;
-    const [globalLevel, globalExp] = getLevel("0", `${target.id}`)!;
-    if (!guildLevel && !guildExp) setLevel(`${guild.id}`, `${target.id}`, 0, 0);
-    if (!globalLevel && !globalExp) setLevel("0", `${target.id}`, 0, 0);
+    const difficulty = getSetting(guild.id, "levelling", "difficulty") as number;
+    const [level, xp] = getLevel(guild.id, target.id)!;
+    const nextLevelXp = Math.floor(
+      100 * difficulty * (level + 1) + 100 * difficulty * level
+    )?.toLocaleString("en-US");
 
-    const nextLevelExp = Math.floor(100 * 1.15 * ((guildLevel ?? 0) + 1))?.toLocaleString("en-US");
-    const globalNextLevelExp = Math.floor(100 * 1.15 * ((globalLevel ?? 0) + 1))?.toLocaleString(
-      "en-US"
-    );
-
+    console.log(xp);
     const collector = reply.createMessageComponentCollector({ time: 60000 });
     collector.on("collect", async (i: ButtonInteraction) => {
       if (i.message.id != (await reply.fetch()).id)
@@ -130,24 +127,13 @@ export default class User {
           name: `•  ${target.nickname ?? user.displayName}`,
           iconURL: target.displayAvatarURL()
         })
-        .setFields(
-          {
-            name: `⚡ • Guild level ${guildLevel ?? 0}`,
-            value: [
-              `**${guildExp.toLocaleString("en-US") ?? 0}/${nextLevelExp}** EXP`,
-              `The next level is **${(guildLevel ?? 0) + 1}**`
-            ].join("\n"),
-            inline: true
-          },
-          {
-            name: `⛈️ • Global level ${globalLevel ?? 0}`,
-            value: [
-              `**${globalExp.toLocaleString("en-US") ?? 0}/${globalNextLevelExp}** EXP`,
-              `The next level is **${(globalLevel ?? 0) + 1}**`
-            ].join("\n"),
-            inline: true
-          }
-        )
+        .setFields({
+          name: `⚡ • Level ${level}`,
+          value: [
+            `**${xp.toLocaleString("en-US")}/${nextLevelXp}** XP`,
+            `The next level is **${level + 1}**`
+          ].join("\n")
+        })
         .setFooter({ text: `User ID: ${target.id}` })
         .setThumbnail(target.displayAvatarURL())
         .setColor(embedColor);

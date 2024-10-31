@@ -35,7 +35,7 @@ export default class Leaderboard {
 
     leaderboardData.sort((a, b) => {
       if (b.level != a.level) return b.level - a.level;
-      else return b.exp - a.exp;
+      else return b.xp - a.xp;
     });
 
     const totalPages = Math.ceil(leaderboardData.length / 5);
@@ -56,7 +56,7 @@ export default class Leaderboard {
         const user = await interaction.client.users.fetch(userData.user);
         embed.addFields({
           name: `#${start + i + 1} • ${user.tag}`,
-          value: `Level **${Math.floor(userData.level)}** • **${Math.floor(userData.exp)}** EXP`
+          value: `Level **${Math.floor(userData.level)}** • **${Math.floor(userData.xp)}** XP`
         });
       }
 

@@ -143,8 +143,10 @@ export async function modEmbed(
     .send({
       embeds: [
         embed
-          .setAuthor({ name: `•  ${name}`, iconURL: user.displayAvatarURL() })
-          .setTitle(`You got ${action.toLowerCase()}.`)
+          .setAuthor({
+            name: `•  You got ${action.toLowerCase()}.`,
+            iconURL: user.displayAvatarURL()
+          })
           .setDescription(generalValues.slice(+!showModerator, generalValues.length).join("\n"))
           .setColor(genColor(0))
       ]
