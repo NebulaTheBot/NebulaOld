@@ -27,15 +27,15 @@ export default class Settings {
     settingsKeys.forEach(key => {
       const subcommand = new SlashCommandSubcommandBuilder()
         .setName(key)
-        .setDescription("This subcommand has no description.");
+        .setDescription(settingsDefinition[key].description);
 
-      Object.keys(settingsDefinition[key]).forEach(sub => {
-        switch (settingsDefinition[key][sub]["type"] as string) {
+      Object.keys(settingsDefinition[key].settings).forEach(sub => {
+        switch (settingsDefinition[key].settings[sub]["type"] as string) {
           case "BOOL":
             subcommand.addBooleanOption(option =>
               option
                 .setName(sub)
-                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setDescription(settingsDefinition[key].settings[sub]["desc"])
                 .setRequired(false)
             );
             break;
@@ -43,7 +43,7 @@ export default class Settings {
             subcommand.addIntegerOption(option =>
               option
                 .setName(sub)
-                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setDescription(settingsDefinition[key].settings[sub]["desc"])
                 .setRequired(false)
             );
             break;
@@ -51,7 +51,7 @@ export default class Settings {
             subcommand.addUserOption(option =>
               option
                 .setName(sub)
-                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setDescription(settingsDefinition[key].settings[sub]["desc"])
                 .setRequired(false)
             );
             break;
@@ -63,7 +63,7 @@ export default class Settings {
             subcommand.addStringOption(option =>
               option
                 .setName(sub)
-                .setDescription(settingsDefinition[key][sub]["desc"])
+                .setDescription(settingsDefinition[key].settings[sub]["desc"])
                 .setRequired(false)
             );
             break;
