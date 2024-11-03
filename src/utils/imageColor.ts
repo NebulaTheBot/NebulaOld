@@ -11,7 +11,9 @@ import sharp from "sharp";
 import { genRGBColor } from "./colorGen";
 
 export async function imageColor(guildURL?: string, memberURL?: string) {
-  const imageBuffer = await (await fetch(guildURL! ?? memberURL)).arrayBuffer();
+  if (!guildURL || !memberURL) return;
+
+  const imageBuffer = await (await fetch(guildURL ?? memberURL)).arrayBuffer();
   const { r, g, b } = (
     await new Vibrant(await sharp(imageBuffer).toFormat("jpg").toBuffer()).getPalette()
   ).Vibrant!;

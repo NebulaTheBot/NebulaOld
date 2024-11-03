@@ -35,7 +35,7 @@ export default class User {
 
     let embed = new EmbedBuilder()
       .setAuthor({
-        name: `${avatar ? "•  " : ""}${user.displayName}`,
+        name: `${avatar ? "•  " : ""}${target?.nickname ?? user.displayName}`,
         iconURL: avatar
       })
       .setFields({
@@ -107,7 +107,7 @@ export default class User {
       100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2
     )?.toLocaleString("en-US");
 
-    const collector = reply.createMessageComponentCollector({ time: 60000 });
+    const collector = reply.createMessageComponentCollector({ time: 30000 });
     collector.on("collect", async (i: ButtonInteraction) => {
       if (i.message.id != (await reply.fetch()).id)
         return await errorEmbed(
@@ -118,7 +118,7 @@ export default class User {
       if (i.user.id != interaction.user.id)
         return await errorEmbed(i, "You aren't the person who executed this command.");
 
-      collector.resetTimer({ time: 60000 });
+      collector.resetTimer({ time: 30000 });
       i.customId == "general"
         ? row.components[0].setDisabled(true)
         : row.components[1].setDisabled(true);

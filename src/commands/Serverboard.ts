@@ -59,7 +59,7 @@ export default class Serverboard {
     });
     if (pages == 1) return;
 
-    const collector = reply.createMessageComponentCollector({ time: 60000 });
+    const collector = reply.createMessageComponentCollector({ time: 30000 });
     collector.on("collect", async (i: ButtonInteraction) => {
       if (i.message.id != (await reply.fetch()).id)
         return await errorEmbed(
@@ -70,7 +70,7 @@ export default class Serverboard {
       if (i.user.id != interaction.user.id)
         return await errorEmbed(i, "You aren't the person who executed this command.");
 
-      collector.resetTimer({ time: 60000 });
+      collector.resetTimer({ time: 30000 });
       switch (i.customId) {
         case "left":
           page--;
