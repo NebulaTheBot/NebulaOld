@@ -70,7 +70,8 @@ export default class Lock {
         .create(guild.id, {
           SendMessages: false,
           SendMessagesInThreads: false,
-          CreatePublicThreads: false
+          CreatePublicThreads: false,
+          CreatePrivateThreads: false
         })
         .catch(error => console.error(error));
 

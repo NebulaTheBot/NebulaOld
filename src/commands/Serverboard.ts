@@ -59,31 +59,32 @@ export default class Serverboard {
     });
     if (pages == 1) return;
 
-    reply
-      .createMessageComponentCollector({ time: 60000 })
-      .on("collect", async (i: ButtonInteraction) => {
-        if (i.message.id != (await reply.fetch()).id)
-          return await errorEmbed(
-            i,
-            "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
-          );
+    const collector = reply.createMessageComponentCollector({ time: 60000 });
+    collector.on("collect", async (i: ButtonInteraction) => {
+      if (i.message.id != (await reply.fetch()).id)
+        return await errorEmbed(
+          i,
+          "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
+        );
 
-        if (i.user.id != interaction.user.id)
-          return await errorEmbed(i, "You aren't the person who executed this command.");
+      if (i.user.id != interaction.user.id)
+        return await errorEmbed(i, "You aren't the person who executed this command.");
 
-        setTimeout(async () => await i.editReply({ components: [] }), 60000);
-        switch (i.customId) {
-          case "left":
-            page--;
-            if (page < 0) page = pages - 1;
-            break;
-          case "right":
-            page++;
-            if (page >= pages) page = 0;
-            break;
-        }
+      collector.resetTimer({ time: 60000 });
+      switch (i.customId) {
+        case "left":
+          page--;
+          if (page < 0) page = pages - 1;
+          break;
+        case "right":
+          page++;
+          if (page >= pages) page = 0;
+          break;
+      }
 
-        await i.update({ embeds: [await getEmbed()], components: [row] });
-      });
+      await i.update({ embeds: [await getEmbed()], components: [row] });
+    });
+
+    collector.on("end", async () => await interaction.editReply({ components: [] }));
   }
 }

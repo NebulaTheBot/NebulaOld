@@ -72,6 +72,7 @@ export default class View {
       if (i.user.id != interaction.user.id)
         return await errorEmbed(i, "You aren't the person who executed this command.");
 
+      collector.resetTimer({ time: 60000 });
       switch (i.customId) {
         case "left":
           page--;

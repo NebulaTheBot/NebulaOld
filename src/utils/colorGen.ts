@@ -3,6 +3,7 @@
  * @param hue Color to randomise.
  * @returns Color in HEX.
  */
+
 export function genColor(hue: number) {
   const h = hue + 15 * Math.random();
   let s = 100;
@@ -27,6 +28,7 @@ export function genColor(hue: number) {
  * @param b Blue.
  * @returns Color in HEX.
  */
+
 export function genRGBColor(r: any, g: any, b: any) {
   r = r.toString(16);
   g = g.toString(16);

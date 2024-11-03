@@ -1,3 +1,13 @@
+/**
+ * Sends news to a channel.
+ * @param guild Guild where the channel is in.
+ * @param id ID of the news.
+ * @param interaction Command nteraction.
+ * @param title Title of the news.
+ * @param body Content of the news.
+ * @returns News message in a channel.
+ */
+
 import {
   EmbedBuilder,
   type ChatInputCommandInteraction,
@@ -9,15 +19,6 @@ import { genColor } from "./colorGen";
 import { get, updateNews } from "./database/news";
 import { getSetting } from "./database/settings";
 
-/**
- * Sends news to a channel.
- * @param guild Guild where the channel is in.
- * @param id ID of the news.
- * @param interaction Command nteraction.
- * @param title Title of the news.
- * @param body Content of the news.
- * @returns News message in a channel.
- */
 export async function sendChannelNews(
   guild: Guild,
   id: string,

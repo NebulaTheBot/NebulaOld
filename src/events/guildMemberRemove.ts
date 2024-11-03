@@ -14,12 +14,12 @@ export default (async function run(member: GuildMember) {
     .find(channel => channel.id == id)
     ?.fetch()) as TextChannel;
 
-  const avatarURL = member.displayAvatarURL();
+  const avatar = member.displayAvatarURL();
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${member.user.displayName} has left`, iconURL: avatarURL })
+    .setAuthor({ name: `•  ${member.user.displayName} has left`, iconURL: avatar })
     .setFooter({ text: `User ID: ${member.id}` })
-    .setThumbnail(avatarURL)
-    .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, member)) ?? genColor(200));
+    .setThumbnail(avatar)
+    .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));
 
   replace(member, getSetting(guildID, "welcome", "leave_text") as string, embed);
   await channel.send({ embeds: [embed] });

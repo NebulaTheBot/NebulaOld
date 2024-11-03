@@ -70,7 +70,8 @@ export default class Unlock {
         .create(guild.id, {
           SendMessages: null,
           SendMessagesInThreads: null,
-          CreatePublicThreads: null
+          CreatePublicThreads: null,
+          CreatePrivateThreads: null
         })
         .catch(error => console.error(error));
 

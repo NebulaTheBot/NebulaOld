@@ -3,7 +3,7 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 import { genColor } from "../utils/colorGen";
-import { getLevel, setLevel } from "../utils/database/levelling";
+import { getLevel, setLevel } from "../utils/database/leveling";
 import { getSetting } from "../utils/database/settings";
 import { kominator } from "../utils/kominator";
 import { Event } from "../utils/types";
@@ -15,22 +15,21 @@ export default (async function run(message) {
   const guild = message.guild!;
 
   // Easter egg handler
-  // i kept the old ID used here (if guild.id == "ID") in my .env file, just in case
-  if (getSetting(guild.id, "easter", "enabled") == true) {
+  if (getSetting(guild.id, "easter", "enabled")) {
     const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
     for (const easterEggFile of readdirSync(eventsPath))
       (await import(pathToFileURL(join(eventsPath, easterEggFile)).toString())).default(message);
   }
 
-  // Levelling
-  if (!getSetting(guild.id, "levelling", "enabled")) return;
+  // Leveling
+  if (!getSetting(guild.id, "leveling", "enabled")) return;
 
-  const blockedChannels = getSetting(guild.id, "levelling", "block_channels") as string;
+  const blockedChannels = getSetting(guild.id, "leveling", "block_channels") as string;
   if (blockedChannels != undefined)
     for (const channelID of kominator(blockedChannels)) if (message.channelId == channelID) return;
 
-  const cooldown = getSetting(guild.id, "levelling", "cooldown") as number;
+  const cooldown = getSetting(guild.id, "leveling", "cooldown") as number;
   if (cooldown > 0) {
     const key = `${guild.id}-${author.id}`;
     const lastExpTime = cooldowns.get(key) || 0;
@@ -40,9 +39,9 @@ export default (async function run(message) {
     else cooldowns.set(key, now);
   }
 
-  const xpGain = getSetting(guild.id, "levelling", "xp_gain") as number;
-  const levelChannelId = getSetting(guild.id, "levelling", "channel");
-  const difficulty = getSetting(guild.id, "levelling", "difficulty") as number;
+  const xpGain = getSetting(guild.id, "leveling", "xp_gain") as number;
+  const levelChannelId = getSetting(guild.id, "leveling", "channel");
+  const difficulty = getSetting(guild.id, "leveling", "difficulty") as number;
   const [level, xp] = getLevel(guild.id, author.id);
   const xpUntilLevelUp = Math.floor(
     100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2

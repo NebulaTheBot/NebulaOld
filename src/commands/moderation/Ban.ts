@@ -41,7 +41,7 @@ export default class Ban {
     let expiresAt: number | undefined;
     if (duration) {
       const durationMs = ms(duration);
-      if (!durationMs)
+      if (!durationMs || durationMs <= 0)
         return await errorEmbed(
           interaction,
           `You can't ban ${user.displayName} temporarily.`,

@@ -55,10 +55,6 @@ export default class Settings {
                 .setRequired(false)
             );
             break;
-          // case "LIST":
-          //   const subcommandGroup = new SlashCommandSubcommandGroupBuilder()
-          //     .setName(sub)
-          //     .setDescription("This subcommand group has no description.");
           default: // Also includes "TEXT"
             subcommand.addStringOption(option =>
               option
@@ -114,7 +110,6 @@ export default class Settings {
 
   async autocomplete(interaction: AutocompleteInteraction) {
     if (interaction.type != InteractionType.ApplicationCommandAutocomplete) return;
-    //if (interaction.options.getSubcommand() != this.data.name) return;
     switch (Object.keys(settingsDefinition[interaction.options.getSubcommand()])[0]) {
       case "BOOL":
         await interaction.respond(

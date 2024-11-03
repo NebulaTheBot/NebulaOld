@@ -1,8 +1,3 @@
-import type { ColorResolvable, Guild, GuildMember, User } from "discord.js";
-import Vibrant from "node-vibrant";
-import sharp from "sharp";
-import { genRGBColor } from "./colorGen";
-
 /**
  * Outputs the most vibrant color from the image.
  * @param guild Guild image.
@@ -10,12 +5,13 @@ import { genRGBColor } from "./colorGen";
  * @returns The color in HEX.
  */
 
-export async function imageColor(guild?: Guild, member?: GuildMember | User) {
-  const guildURL = guild?.iconURL();
-  const memberURL = member?.displayAvatarURL();
-  if (!guildURL || !memberURL) return;
+import type { ColorResolvable } from "discord.js";
+import Vibrant from "node-vibrant";
+import sharp from "sharp";
+import { genRGBColor } from "./colorGen";
 
-  const imageBuffer = await (await fetch(guild ? guildURL : memberURL)).arrayBuffer();
+export async function imageColor(guildURL?: string, memberURL?: string) {
+  const imageBuffer = await (await fetch(guildURL! ?? memberURL)).arrayBuffer();
   const { r, g, b } = (
     await new Vibrant(await sharp(imageBuffer).toFormat("jpg").toBuffer()).getPalette()
   ).Vibrant!;

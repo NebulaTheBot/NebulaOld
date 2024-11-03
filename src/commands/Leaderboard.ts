@@ -9,7 +9,7 @@ import {
   type SlashCommandOptionsOnlyBuilder
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
-import { getGuildLeaderboard } from "../utils/database/levelling";
+import { getGuildLeaderboard } from "../utils/database/leveling";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 
 export default class Leaderboard {
@@ -30,7 +30,7 @@ export default class Leaderboard {
       return errorEmbed(
         interaction,
         "No data found.",
-        "There is no levelling data for this server yet."
+        "There is no leveling data for this server yet."
       );
 
     leaderboardData.sort((a, b) => {
@@ -86,9 +86,16 @@ export default class Leaderboard {
       });
 
       collector.on("collect", async (i: ButtonInteraction) => {
-        if (i.user.id != interaction.user.id)
-          return errorEmbed(i, "You are not the author of this command.");
+        if (i.message.id != (await reply.fetch()).id)
+          return await errorEmbed(
+            i,
+            "For some reason, this click would've caused the bot to error. Thankfully, this message right here prevents that."
+          );
 
+        if (i.user.id != interaction.user.id)
+          return errorEmbed(i, "You are not the person who executed this command.");
+
+        collector.resetTimer({ time: 60000 });
         if (i.customId == "left") page = page > 1 ? page - 1 : totalPages;
         else page = page < totalPages ? page + 1 : 1;
 

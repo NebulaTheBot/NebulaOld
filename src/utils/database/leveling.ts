@@ -2,7 +2,7 @@ import { getDatabase } from ".";
 import { TableDefinition, TypeOfDefinition } from "./types";
 
 const tableDefinition = {
-  name: "levelling",
+  name: "leveling",
   definition: {
     guild: "TEXT",
     user: "TEXT",
@@ -13,13 +13,13 @@ const tableDefinition = {
 
 const database = getDatabase(tableDefinition);
 
-const getQuery = database.query("SELECT * FROM levelling WHERE guild = $1 AND user = $2;");
-const deleteQuery = database.query("DELETE FROM levelling WHERE guild = $1 AND user = $2;");
+const getQuery = database.query("SELECT * FROM leveling WHERE guild = $1 AND user = $2;");
+const deleteQuery = database.query("DELETE FROM leveling WHERE guild = $1 AND user = $2;");
 const insertQuery = database.query(
-  "INSERT INTO levelling (guild, user, level, xp) VALUES (?1, ?2, ?3, ?4);"
+  "INSERT INTO leveling (guild, user, level, xp) VALUES (?1, ?2, ?3, ?4);"
 );
 
-const getGuildQuery = database.query("SELECT * FROM levelling WHERE guild = $1;");
+const getGuildQuery = database.query("SELECT * FROM leveling WHERE guild = $1;");
 
 export function getLevel(guildID: string, userID: string): [number, number] {
   const res = getQuery.all(guildID, userID) as TypeOfDefinition<typeof tableDefinition>[];

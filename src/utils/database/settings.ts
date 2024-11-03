@@ -18,32 +18,22 @@ export const settingsDefinition: Record<
     settings: Record<string, { type: FieldData; desc: string; val?: any }>;
   }
 > = {
-  levelling: {
+  leveling: {
     description: "Customise the behaviour of the leveling system.",
     settings: {
       enabled: {
         type: "BOOL",
-        desc: "Enable/disable the levelling system.",
+        desc: "Enable/disable the leveling system.",
         val: true
       },
       channel: {
         type: "TEXT",
-        desc: "ID of the log channel for levelling-related stuff (i.e someone levelling up)."
+        desc: "ID of the log channel for leveling-related stuff (i.e someone leveling up)."
       },
       block_channels: {
         type: "TEXT",
         desc: "ID(s) of the channels where messages aren't counted, comma separated."
       },
-      // set_level: { type: "TEXT", desc: "Set the level of a user." },
-      // add_multiplier: {
-      //   type: "LIST",
-      //   desc: "Add an XP multiplier to the levelling system.",
-      //   val: {
-      //     multiplier: { type: "INTEGER", desc: "Set the XP multiplier for the role/channel." },
-      //     role_channel: { type: "TEXT", desc: "Role or channel. (choose)" },
-      //     id: { type: "TEXT", desc: "ID of the role/channel." }
-      //   }
-      // },
       xp_gain: {
         type: "INTEGER",
         desc: "Set the amount of XP a user gains per message.",
@@ -62,7 +52,7 @@ export const settingsDefinition: Record<
     }
   },
   moderation: {
-    description: "Tweak Sokora's moderation-related logs.",
+    description: "Change where Sokora sends moderation logs.",
     settings: {
       channel: {
         type: "TEXT",
@@ -76,7 +66,7 @@ export const settingsDefinition: Record<
     }
   },
   news: {
-    description: "Configure news for this server.",
+    description: "Configure news for your server.",
     settings: {
       channel_id: {
         type: "TEXT",
@@ -104,7 +94,7 @@ export const settingsDefinition: Record<
     }
   },
   welcome: {
-    description: "Tweak how Sokora welcomes your new users",
+    description: "Change how Sokora welcomes your new users.",
     settings: {
       join_text: {
         type: "TEXT",
@@ -130,12 +120,12 @@ export const settingsDefinition: Record<
     }
   },
   easter: {
-    description: "Enable or disable easter eggs",
+    description: "Enable/disable easter eggs.",
     settings: {
       enabled: {
         type: "BOOL",
         desc: "Whether or not the bot should reply to certain messages with 'easter egg' messages.",
-        val: true
+        val: false
       }
     }
   }

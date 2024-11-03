@@ -9,12 +9,12 @@ export default (async function run(member) {
   const guildID = member.guild.id;
   const id = getSetting(guildID, "welcome", "channel") as string;
   const user = member.user;
-  const avatarURL = member.displayAvatarURL();
+  const avatar = member.displayAvatarURL();
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `•  ${user.displayName} has joined`, iconURL: avatarURL })
+    .setAuthor({ name: `•  ${user.displayName} has joined`, iconURL: avatar })
     .setFooter({ text: `User ID: ${member.id}` })
-    .setThumbnail(avatarURL)
-    .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, member)) ?? genColor(200));
+    .setThumbnail(avatar)
+    .setColor(member.user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(200));
 
   if (id) {
     const channel = (await member.guild.channels.cache

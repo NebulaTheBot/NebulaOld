@@ -9,7 +9,7 @@ import {
   type SlashCommandOptionsOnlyBuilder
 } from "discord.js";
 import { genColor } from "../utils/colorGen";
-import { getLevel } from "../utils/database/levelling";
+import { getLevel } from "../utils/database/leveling";
 import { getSetting } from "../utils/database/settings";
 import { errorEmbed } from "../utils/embeds/errorEmbed";
 import { imageColor } from "../utils/imageColor";
@@ -25,14 +25,38 @@ export default class User {
 
   async run(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
-    const target = guild.members.cache.get(
-      interaction.options.getUser("user")?.id ?? interaction.user.id
-    )!;
+    const user = interaction.options.getUser("user") ?? interaction.user;
+    const target = guild.members.cache.get(user.id);
+    const avatar = target?.displayAvatarURL() ?? user.displayAvatarURL();
+    const embedColor =
+      (await target?.user.fetch())?.hexAccentColor ??
+      (await imageColor(undefined, avatar)) ??
+      genColor(200);
 
-    const user = await target.user.fetch();
+    let embed = new EmbedBuilder()
+      .setAuthor({
+        name: `${avatar ? "•  " : ""}${user.displayName}`,
+        iconURL: avatar
+      })
+      .setFields({
+        name: `<:discord:1266797021126459423> • Discord info`,
+        value: [
+          `Username is **${user.username}**`,
+          `Display name is ${
+            user.displayName == user.username ? "*not there*" : `**${user.displayName}**`
+          }`,
+          `Created on **<t:${Math.round(user.createdAt.valueOf() / 1000)}:D>**`
+        ].join("\n")
+      })
+      .setFooter({ text: `User ID: ${user.id}` })
+      .setThumbnail(avatar)
+      .setColor(embedColor);
+
+    await interaction.reply({ embeds: [embed] });
+
+    if (!target) return;
     let serverInfo = [`Joined on **<t:${Math.round(target.joinedAt?.valueOf()! / 1000)}:D>**`];
     const guildRoles = guild.roles.cache.filter(role => target.roles.cache.has(role.id))!;
-    const avatar = target.displayAvatarURL();
     const memberRoles = [...guildRoles].sort(
       (role1, role2) => role2[1].position - role1[1].position
     );
@@ -52,35 +76,12 @@ export default class User {
           .join(", ")}${rolesLength > 3 ? ` and **${rolesLength - 3}** more` : ""}`
       );
 
-    const embedColor =
-      user.hexAccentColor ?? (await imageColor(undefined, target)) ?? genColor(200);
+    embed.addFields({
+      name: "📒 • Server info",
+      value: serverInfo.join("\n")
+    });
 
-    let embed = new EmbedBuilder()
-      .setAuthor({
-        name: `${avatar ? "•  " : ""}${target.nickname ?? user.displayName}`,
-        iconURL: avatar
-      })
-      .setFields(
-        {
-          name: `<:discord:1266797021126459423> • Discord info`,
-          value: [
-            `Username is **${user.username}**`,
-            `Display name is ${
-              user.displayName == user.username ? "*not there*" : `**${user.displayName}**`
-            }`,
-            `Created on **<t:${Math.round(user.createdAt.valueOf() / 1000)}:D>**`
-          ].join("\n")
-        },
-        {
-          name: "📒 • Server info",
-          value: serverInfo.join("\n")
-        }
-      )
-      .setFooter({ text: `User ID: ${target.id}` })
-      .setThumbnail(avatar)
-      .setColor(embedColor);
-
-    const enabled = getSetting(`${guild.id}`, "levelling", "enabled");
+    const enabled = getSetting(`${guild.id}`, "leveling", "enabled");
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("general")
@@ -94,13 +95,13 @@ export default class User {
         .setStyle(ButtonStyle.Primary)
     );
     row.components[0].setDisabled(true);
-    const reply = await interaction.reply({
+    const reply = await interaction.editReply({
       embeds: [embed],
       components: !user.bot ? (enabled ? [row] : []) : []
     });
 
     if (!enabled && user.bot) return;
-    const difficulty = getSetting(guild.id, "levelling", "difficulty") as number;
+    const difficulty = getSetting(guild.id, "leveling", "difficulty") as number;
     const [level, xp] = getLevel(guild.id, target.id)!;
     const nextLevelXp = Math.floor(
       100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2
@@ -117,6 +118,7 @@ export default class User {
       if (i.user.id != interaction.user.id)
         return await errorEmbed(i, "You aren't the person who executed this command.");
 
+      collector.resetTimer({ time: 60000 });
       i.customId == "general"
         ? row.components[0].setDisabled(true)
         : row.components[1].setDisabled(true);

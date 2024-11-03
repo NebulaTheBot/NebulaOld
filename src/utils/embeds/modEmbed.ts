@@ -1,4 +1,4 @@
-import { EmbedBuilder, inlineCode, type ChatInputCommandInteraction, type User } from "discord.js";
+import { EmbedBuilder, type ChatInputCommandInteraction, type User } from "discord.js";
 import ms from "ms";
 import { genColor } from "../colorGen";
 import { addModeration, type modType } from "../database/moderation";

@@ -1,3 +1,10 @@
+/**
+ * Sends a message in the log channel. (if there is one set)
+ * @param guild The guild where the log channel is located.
+ * @param embed Embed of the log.
+ * @returns Log message.
+ */
+
 import {
   ChannelType,
   type Channel,
@@ -7,12 +14,6 @@ import {
 } from "discord.js";
 import { getSetting } from "./database/settings";
 
-/**
- * Sends a message in the log channel. (if there is one set)
- * @param guild The guild where the log channel is located.
- * @param embed Embed of the log.
- * @returns Log message.
- */
 export async function logChannel(guild: Guild, embed: EmbedBuilder) {
   const logChannel = getSetting(guild.id, "moderation", "channel");
   if (!logChannel) return;

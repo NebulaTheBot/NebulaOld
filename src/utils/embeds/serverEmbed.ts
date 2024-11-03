@@ -25,7 +25,7 @@ export async function serverEmbed(options: Options) {
   ).size;
   const bots = members.filter(member => member.user.bot);
   const formattedUserCount = (guild.memberCount - bots.size)?.toLocaleString("en-US");
-  const icon = guild.iconURL();
+  const icon = guild.iconURL()!;
 
   const roles = guild.roles.cache;
   const sortedRoles = [...roles].sort((role1, role2) => role2[1].position - role1[1].position);
@@ -48,13 +48,13 @@ export async function serverEmbed(options: Options) {
   const embed = new EmbedBuilder()
     .setAuthor({
       name: `${pages ? `#${page}  •  ` : icon ? "•  " : ""}${guild.name}`,
-      iconURL: icon!
+      iconURL: icon
     })
     .setDescription(guild.description ? guild.description : null)
     .setFields({ name: "📃 • General", value: generalValues.join("\n") })
     .setFooter({ text: `${pages ? `Page ${page}/${pages}\n` : ""}Server ID: ${guild.id}` })
     .setThumbnail(icon)
-    .setColor((await imageColor(guild)) ?? genColor(200));
+    .setColor((await imageColor(icon)) ?? genColor(200));
 
   if (options.roles)
     embed.addFields({

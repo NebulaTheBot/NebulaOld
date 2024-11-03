@@ -24,11 +24,12 @@ export default class About {
     const guilds = client.guilds.cache;
     const members = guilds.map(guild => guild.memberCount).reduce((a, b) => a + b);
     const shards = client.shard?.count;
+    const avatar = user.displayAvatarURL();
     let emojis = ["💖", "💝", "💓", "💗", "💘", "💟", "💕", "💞"];
     if (Math.round(Math.random() * 100) <= 5) emojis = ["⌨️", "💻", "🖥️"];
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: "•  About Sokora", iconURL: user.displayAvatarURL() })
+      .setAuthor({ name: "•  About Sokora", iconURL: avatar })
       .setDescription(
         "Sokora is a multipurpose Discord bot that lets you manage your servers easily."
       )
@@ -61,8 +62,8 @@ export default class About {
         }
       )
       .setFooter({ text: `Made with ${randomise(emojis)} by the Sokora team` })
-      .setThumbnail(user.displayAvatarURL())
-      .setColor(user.hexAccentColor ?? (await imageColor(undefined, user)) ?? genColor(270));
+      .setThumbnail(avatar)
+      .setColor(user.hexAccentColor ?? (await imageColor(undefined, avatar)) ?? genColor(270));
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()

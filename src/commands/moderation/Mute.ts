@@ -41,7 +41,7 @@ export default class Mute {
     )
       return;
 
-    if (!ms(duration) || ms(duration) > ms("28d"))
+    if (!ms(duration) || ms(duration) > ms("28d") || ms(duration) <= 0)
       return await errorEmbed(
         interaction,
         `You can't mute ${user.displayName}.`,
