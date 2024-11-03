@@ -1,6 +1,6 @@
 <div align="center">
   <p>
-    <img src="static/banner.svg" />
+    <img src="static/banner.png" />
   </p>
   <p>
     <a href="https://discord.gg/c6C25P4BuY"><img src="https://img.shields.io/discord/903852579837059113?color=5865F2&logo=discord&logoColor=white" /></a>
