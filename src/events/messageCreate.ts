@@ -15,7 +15,8 @@ export default (async function run(message) {
   const guild = message.guild!;
 
   // Easter egg handler
-  if (guild.id == "1079612082636472420") {
+  // i kept the old ID used here (if guild.id == "ID") in my .env file, just in case
+  if (getSetting(guild.id, "easter", "enabled") == true) {
     const eventsPath = join(process.cwd(), "src", "events", "easterEggs");
 
     for (const easterEggFile of readdirSync(eventsPath))

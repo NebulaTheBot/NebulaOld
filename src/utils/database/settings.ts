@@ -103,6 +103,13 @@ export const settingsDefinition: Record<
       desc: "Text sent in the user's DM when they join the server. Same syntax as join_text.",
       val: "Welcome to (servername), (name)! Interestingly, you just helped us reach (count) members. Have a nice day!"
     }
+  },
+  easter: {
+    enabled: {
+        type: "BOOL",
+        desc: "Whether or not the bot should reply to certain messages with 'easter egg' messages.",
+        val: true
+    }
   }
 };
 
