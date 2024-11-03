@@ -9,6 +9,7 @@
   "main": "./src/index.ts",
   "type": "module",
   "scripts": {
+    "setup": "bun i && bun run cli/setup.ts",
     "start": "bun ./src/index.ts"
   },
   "dependencies": {

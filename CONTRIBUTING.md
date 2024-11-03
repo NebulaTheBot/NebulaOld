@@ -6,7 +6,7 @@
 
 ## Get started with contributing
 ### Getting the code
-- Make a fork of this repository. 
+- Make a fork of this repository.
 - Clone your fork.
 
 ### Creating your bot
@@ -15,11 +15,9 @@
 - Reset and then copy your bot's token.
 
 ### Setting up .env
-- Copy the `example.env` file.
-- Paste it into a `.env` file and replace the token with your own.
+- Run `bun run setup` and our cli tool will install dependencies and write .env for you
 
 ### Running
-- Run `bun i` to install all the dependencies needed by the bot. 
 - Run `bun start`.
 
 Be sure to open a pull request when you're ready to push your changes. Be descriptive of the changes you've made.
