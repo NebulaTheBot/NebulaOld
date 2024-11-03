@@ -27,9 +27,7 @@ export default class Unban {
     const id = interaction.options.getString("id")!;
     const reason = interaction.options.getString("reason")!;
     const guild = interaction.guild!;
-    const target = (await guild.bans.fetch())
-      .map(ban => ban.user)
-      .filter(user => user.id == id)[0]!;
+    const target = (await guild.bans.fetch()).get(id)?.user!;
 
     if (
       await errorCheck(

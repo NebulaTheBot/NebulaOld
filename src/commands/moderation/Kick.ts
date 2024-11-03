@@ -3,6 +3,7 @@ import {
   SlashCommandSubcommandBuilder,
   type ChatInputCommandInteraction
 } from "discord.js";
+import { errorEmbed } from "../../utils/embeds/errorEmbed";
 import { errorCheck, modEmbed } from "../../utils/embeds/modEmbed";
 
 export default class Kick {
@@ -30,6 +31,13 @@ export default class Kick {
       )
     )
       return;
+
+    if (!interaction.guild?.members.cache.get(user.id))
+      return await errorEmbed(
+        interaction,
+        `You can't kick ${user.displayName}.`,
+        "This user is not in the server."
+      );
 
     const reason = interaction.options.getString("reason");
     await interaction.guild?.members.cache

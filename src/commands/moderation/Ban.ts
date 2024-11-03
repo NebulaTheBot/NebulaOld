@@ -38,6 +38,13 @@ export default class Ban {
     )
       return;
 
+    if ((await guild.bans.fetch()).get(user.id))
+      return await errorEmbed(
+        interaction,
+        `You can't ban ${user.displayName}.`,
+        "This user is already banned."
+      );
+
     let expiresAt: number | undefined;
     if (duration) {
       const durationMs = ms(duration);
