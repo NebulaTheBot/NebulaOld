@@ -8,6 +8,7 @@ import { getSetting } from "../utils/database/settings";
 import { kominator } from "../utils/kominator";
 import { Event } from "../utils/types";
 
+const cooldowns = new Map<string, number>();
 export default (async function run(message) {
   const author = message.author;
   if (author.bot) return;
@@ -24,21 +25,11 @@ export default (async function run(message) {
   // Levelling
   if (!getSetting(guild.id, "levelling", "enabled")) return;
 
-  // const level = getSetting(guild.id, "levelling", "set_level") as string;
-  // if (level) {
-  //   const newLevel = kominator(level);
-  //   setLevel(guild.id, newLevel[0], +newLevel[1], 100 * +newLevel[1]);
-  //   setSetting(guild.id, "levelling", "set_level", "");
-  // }
-
   const blockedChannels = getSetting(guild.id, "levelling", "block_channels") as string;
   if (blockedChannels != undefined)
     for (const channelID of kominator(blockedChannels)) if (message.channelId == channelID) return;
 
-  const cooldowns = new Map<string, number>();
   const cooldown = getSetting(guild.id, "levelling", "cooldown") as number;
-  // const multiplier = getSetting(guild.id, "levelling", "add_multiplier");
-
   if (cooldown > 0) {
     const key = `${guild.id}-${author.id}`;
     const lastExpTime = cooldowns.get(key) || 0;
@@ -47,34 +38,26 @@ export default (async function run(message) {
     if (now - lastExpTime < cooldown * 1000) return;
     else cooldowns.set(key, now);
   }
-  console.log(cooldowns);
-
-  // if (multiplier) {
-  //   const expMultiplier = kominator(multiplier as string);
-  //
-  //   if (expMultiplier[1] == "channel") if (message.channelId != expMultiplier[2]) return;
-  //   if (expMultiplier[1] == "role")
-  //     if (!message.member?.roles.cache.has(expMultiplier[2])) return;
-  //
-  //   expGain = expGain * +expMultiplier[0];
-  // }
 
   const xpGain = getSetting(guild.id, "levelling", "xp_gain") as number;
   const levelChannelId = getSetting(guild.id, "levelling", "channel");
   const difficulty = getSetting(guild.id, "levelling", "difficulty") as number;
   const [level, xp] = getLevel(guild.id, author.id);
-  const xpUntilLevelup = 100 * difficulty * (level + 1) + 100 * difficulty * level;
+  const xpUntilLevelUp = Math.floor(
+    100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2
+  );
   const newLevelData = { level: level ?? 0, xp: xp + xpGain };
 
-  console.log(xp, newLevelData.xp);
-  if (newLevelData.xp < xpUntilLevelup)
+  if (newLevelData.xp < xpUntilLevelUp)
     return setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
 
-  if (newLevelData.xp >= xpUntilLevelup) {
-    newLevelData.level = level + 1;
-    setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
-  }
+  while (
+    newLevelData.xp >=
+    100 * difficulty * (newLevelData.level + 1) ** 2 - 85 * difficulty * newLevelData.level ** 2
+  )
+    newLevelData.level++;
 
+  setLevel(guild.id, author.id, newLevelData.level, newLevelData.xp);
   const embed = new EmbedBuilder()
     .setAuthor({
       name: `•  ${author.displayName} has levelled up!`,
@@ -96,17 +79,4 @@ export default (async function run(message) {
       embeds: [embed],
       content: `<@${author.id}>`
     });
-
-  // for (const { level, roleID } of getLevelRewards(guild.id)) {
-  //   const role = guild.roles.cache.get(`${roleID}`);
-  //   if (!role) continue;
-  //
-  //   const authorRoles = (await guild.members.fetch()).get(author.id)?.roles;
-  //   if (guildLevel >= level) {
-  //     await authorRoles?.add(role);
-  //     continue;
-  //   }
-  //
-  //   await authorRoles?.remove(role);
-  // }
 } as Event<"messageCreate">);

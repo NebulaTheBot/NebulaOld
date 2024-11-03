@@ -38,7 +38,7 @@ export const settingsDefinition: Record<
     xp_gain: {
       type: "INTEGER",
       desc: "Set the amount of XP a user gains per message.",
-      val: 2
+      val: 5
     },
     cooldown: {
       type: "INTEGER",
@@ -48,7 +48,7 @@ export const settingsDefinition: Record<
     difficulty: {
       type: "INTEGER",
       desc: "Set the difficulty (ex: 2 will make it 2x harder to level up).",
-      val: 1.25
+      val: 1
     }
   },
   moderation: {

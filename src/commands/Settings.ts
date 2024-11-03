@@ -88,7 +88,6 @@ export default class Settings {
 
     const key = interaction.options.getSubcommand() as keyof typeof settingsDefinition;
     const values = interaction.options.data[0].options!;
-    console.log(values);
     if (!values.length) {
       const embed = new EmbedBuilder().setTitle(`Settings for ${key}`).setColor(genColor(100));
       const description: string[] = [];

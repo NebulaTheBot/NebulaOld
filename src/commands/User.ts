@@ -103,10 +103,9 @@ export default class User {
     const difficulty = getSetting(guild.id, "levelling", "difficulty") as number;
     const [level, xp] = getLevel(guild.id, target.id)!;
     const nextLevelXp = Math.floor(
-      100 * difficulty * (level + 1) + 100 * difficulty * level
+      100 * difficulty * (level + 1) ** 2 - 85 * difficulty * level ** 2
     )?.toLocaleString("en-US");
 
-    console.log(xp);
     const collector = reply.createMessageComponentCollector({ time: 60000 });
     collector.on("collect", async (i: ButtonInteraction) => {
       if (i.message.id != (await reply.fetch()).id)
