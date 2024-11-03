@@ -48,8 +48,8 @@ export default class About {
             "**Founder**: Goos",
             "**Translator Lead**: ThatBOI",
             "**Developers**: Dimkauzh, Froxcey, Golem64, Koslz, MQuery, Nikkerudon, Spectrum, ThatBOI",
-            "**Designers**: ArtyH, Optix, Pjanda",
-            "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, Optix, SaFire, TrulyBlue",
+            "**Designers**: ArtyH, ZakaHaceCosas, Pjanda",
+            "**Translators**: Dimkauzh, flojo, Golem64, GraczNet, Nikkerudon, ZakaHaceCosas, SaFire, TrulyBlue",
             "**Testers**: Blaze, fishy, Trynera",
             "And **YOU**, for using Sokora."
           ].join("\n")
